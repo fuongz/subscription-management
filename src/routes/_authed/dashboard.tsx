@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardStats } from "@/components/dashboard-stats";
+import { useAppTour } from "@/hooks/use-app-tour";
 import type { SupportedCurrency } from "@/lib/currency-utils";
 import { getSubscriptions } from "@/server/subscriptions";
 import { getUserPreferences } from "@/server/user-preferences";
@@ -18,6 +19,11 @@ export const Route = createFileRoute("/_authed/dashboard")({
 function DashboardPage() {
 	const { subscriptions, preferences } = Route.useLoaderData();
 	const currency = (preferences.currency || "VND") as SupportedCurrency;
+
+	useAppTour({
+		page: "dashboard",
+	});
+
 	return (
 		<div className="space-y-6">
 			<h1 className="text-2xl font-bold font-serif">Dashboard</h1>

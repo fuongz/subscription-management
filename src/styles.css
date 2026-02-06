@@ -183,4 +183,29 @@ body {
   [role="button"]:not([disabled]) {
     cursor: pointer;
   }
+
+  .phake-tour-popover, 
+  .phake-tour-popover * {
+    @apply !font-sans;
+  }
+
+  .phake-tour-popover {
+    @apply !rounded-xl !p-6 !min-w-[300px];
+  }
+
+  .phake-tour-popover .driver-popover-title {
+    @apply !font-serif;
+  }
+
+  .phake-tour-popover .driver-popover-description {
+    @apply !text-muted-foreground;
+  }
+
+  .phake-tour-popover .driver-popover-close-btn {
+    @apply !text-2xl;
+  }
+
+  .phake-tour-popover .driver-popover-navigation-btns > button {
+    @apply !bg-primary !border-none !text-primary-foreground !text-shadow-none !text-sm !rounded-xl !px-4 !font-medium !py-1;
+  }
 }

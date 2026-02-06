@@ -135,7 +135,7 @@ export function DashboardStats({
 
 	return (
 		<div className="space-y-6">
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			<div data-tour="stats-cards" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				<Card>
 					<CardHeader>
 						<CardDescription>Monthly Spend</CardDescription>
@@ -202,7 +202,7 @@ export function DashboardStats({
 			</div>
 
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-				<Card>
+				<Card data-tour="upcoming-renewals">
 					<CardHeader>
 						<CardTitle className="text-base">Upcoming Renewals</CardTitle>
 					</CardHeader>
@@ -267,7 +267,7 @@ export function DashboardStats({
 					</CardContent>
 				</Card>
 
-				<Card>
+				<Card data-tour="category-breakdown">
 					<CardHeader>
 						<CardTitle className="text-base">
 							Monthly Spend by Category

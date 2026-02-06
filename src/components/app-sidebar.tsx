@@ -70,7 +70,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 
 			<SidebarContent>
-				<SidebarGroup>
+				<SidebarGroup data-tour="sidebar-nav">
 					<SidebarGroupLabel>Navigation</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
@@ -95,7 +95,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				</SidebarGroup>
 			</SidebarContent>
 
-			<SidebarFooter>
+			<SidebarFooter data-tour="sidebar-user">
 				<SidebarMenu>
 					<SidebarMenuItem>
 						{session?.user && (
