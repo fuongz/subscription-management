@@ -27,12 +27,15 @@ export const Route = createFileRoute("/register")({
 
 function getFieldError(field: {
 	state: {
-		meta: { isTouched: boolean; errors: Array<string | { message: string }> };
+		meta: { isTouched: boolean; errors: unknown[] };
 	};
 }) {
 	if (!field.state.meta.isTouched || field.state.meta.errors.length === 0)
 		return undefined;
 	return field.state.meta.errors
+		.filter((e): e is string | { message: string } =>
+			e !== undefined && (typeof e === "string" || (typeof e === "object" && e !== null && "message" in e))
+		)
 		.map((e) => (typeof e === "string" ? e : e.message))
 		.join(", ");
 }
@@ -67,7 +70,7 @@ function RegisterPage() {
 	});
 
 	return (
-		<div className="flex min-h-[60vh] items-center justify-center">
+		<div className="flex min-h-screen bg-muted items-center justify-center">
 			<Card className="w-full max-w-md">
 				<CardHeader>
 					<CardTitle>Create Account</CardTitle>
@@ -95,7 +98,8 @@ function RegisterPage() {
 								onChange: ({ value }) =>
 									!value ? "Name is required" : undefined,
 							}}
-							children={(field) => {
+						>
+							{(field) => {
 								const fieldError = getFieldError(field);
 								return (
 									<Field data-invalid={fieldError ? true : undefined}>
@@ -119,7 +123,7 @@ function RegisterPage() {
 									</Field>
 								);
 							}}
-						/>
+						</form.Field>
 
 						<form.Field
 							name="email"
@@ -127,7 +131,8 @@ function RegisterPage() {
 								onChange: ({ value }) =>
 									!value ? "Email is required" : undefined,
 							}}
-							children={(field) => {
+						>
+							{(field) => {
 								const fieldError = getFieldError(field);
 								return (
 									<Field data-invalid={fieldError ? true : undefined}>
@@ -152,7 +157,7 @@ function RegisterPage() {
 									</Field>
 								);
 							}}
-						/>
+						</form.Field>
 
 						<form.Field
 							name="password"
@@ -164,7 +169,8 @@ function RegisterPage() {
 											? "Password must be at least 8 characters"
 											: undefined,
 							}}
-							children={(field) => {
+						>
+							{(field) => {
 								const fieldError = getFieldError(field);
 								return (
 									<Field data-invalid={fieldError ? true : undefined}>
@@ -189,12 +195,13 @@ function RegisterPage() {
 									</Field>
 								);
 							}}
-						/>
+						</form.Field>
 					</CardContent>
 					<CardFooter className="flex flex-col gap-4 mt-4">
 						<form.Subscribe
 							selector={(state) => [state.canSubmit, state.isSubmitting]}
-							children={([canSubmit, isSubmitting]) => (
+						>
+							{([canSubmit, isSubmitting]) => (
 								<Button
 									type="submit"
 									className="w-full"
@@ -203,7 +210,7 @@ function RegisterPage() {
 									{isSubmitting ? "Creating account..." : "Create Account"}
 								</Button>
 							)}
-						/>
+						</form.Subscribe>
 
 						<div className="relative w-full">
 							<div className="absolute inset-0 flex items-center">

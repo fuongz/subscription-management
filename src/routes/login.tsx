@@ -27,12 +27,18 @@ export const Route = createFileRoute("/login")({
 
 function getFieldError(field: {
 	state: {
-		meta: { isTouched: boolean; errors: Array<string | { message: string }> };
+		meta: { isTouched: boolean; errors: unknown[] };
 	};
 }) {
 	if (!field.state.meta.isTouched || field.state.meta.errors.length === 0)
 		return undefined;
 	return field.state.meta.errors
+		.filter(
+			(e): e is string | { message: string } =>
+				e !== undefined &&
+				(typeof e === "string" ||
+					(typeof e === "object" && e !== null && "message" in e)),
+		)
 		.map((e) => (typeof e === "string" ? e : e.message))
 		.join(", ");
 }
@@ -65,7 +71,7 @@ function LoginPage() {
 	});
 
 	return (
-		<div className="flex min-h-[60vh] items-center justify-center">
+		<div className="flex min-h-screen bg-muted items-center justify-center">
 			<Card className="w-full max-w-md">
 				<CardHeader>
 					<CardTitle>Sign In</CardTitle>
@@ -93,7 +99,8 @@ function LoginPage() {
 								onChange: ({ value }) =>
 									!value ? "Email is required" : undefined,
 							}}
-							children={(field) => {
+						>
+							{(field) => {
 								const fieldError = getFieldError(field);
 								return (
 									<Field data-invalid={fieldError ? true : undefined}>
@@ -118,7 +125,7 @@ function LoginPage() {
 									</Field>
 								);
 							}}
-						/>
+						</form.Field>
 
 						<form.Field
 							name="password"
@@ -126,7 +133,8 @@ function LoginPage() {
 								onChange: ({ value }) =>
 									!value ? "Password is required" : undefined,
 							}}
-							children={(field) => {
+						>
+							{(field) => {
 								const fieldError = getFieldError(field);
 								return (
 									<Field data-invalid={fieldError ? true : undefined}>
@@ -151,12 +159,13 @@ function LoginPage() {
 									</Field>
 								);
 							}}
-						/>
+						</form.Field>
 					</CardContent>
 					<CardFooter className="flex flex-col gap-4 mt-4">
 						<form.Subscribe
 							selector={(state) => [state.canSubmit, state.isSubmitting]}
-							children={([canSubmit, isSubmitting]) => (
+						>
+							{([canSubmit, isSubmitting]) => (
 								<Button
 									type="submit"
 									className="w-full"
@@ -165,7 +174,7 @@ function LoginPage() {
 									{isSubmitting ? "Signing in..." : "Sign In"}
 								</Button>
 							)}
-						/>
+						</form.Subscribe>
 
 						<div className="relative w-full">
 							<div className="absolute inset-0 flex items-center">

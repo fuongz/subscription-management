@@ -55,12 +55,15 @@ const COMMON_TIMEZONES = [
 
 function getFieldError(field: {
 	state: {
-		meta: { isTouched: boolean; errors: Array<string | { message: string }> };
+		meta: { isTouched: boolean; errors: unknown[] };
 	};
 }) {
 	if (!field.state.meta.isTouched || field.state.meta.errors.length === 0)
 		return undefined;
 	return field.state.meta.errors
+		.filter((e): e is string | { message: string } =>
+			e !== undefined && (typeof e === "string" || (typeof e === "object" && e !== null && "message" in e))
+		)
 		.map((e) => (typeof e === "string" ? e : e.message))
 		.join(", ");
 }
@@ -179,14 +182,13 @@ function SettingsPage() {
 						</form.Field>
 
 						{/* Default Currency */}
-						<form.Field
-							name="currency"
-							children={(field) => (
+						<form.Field name="currency">
+							{(field) => (
 								<Field>
 									<FieldLabel htmlFor={field.name}>Default Currency</FieldLabel>
 									<Select
 										value={field.state.value}
-										onValueChange={(v) => field.handleChange(v)}
+										onValueChange={(v) => v && field.handleChange(v)}
 									>
 										<SelectTrigger>
 											<DollarSign className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -199,17 +201,16 @@ function SettingsPage() {
 									</Select>
 								</Field>
 							)}
-						/>
+						</form.Field>
 
 						{/* Timezone */}
-						<form.Field
-							name="timezone"
-							children={(field) => (
+						<form.Field name="timezone">
+							{(field) => (
 								<Field>
 									<FieldLabel htmlFor={field.name}>Timezone</FieldLabel>
 									<Select
 										value={field.state.value}
-										onValueChange={(v) => field.handleChange(v)}
+										onValueChange={(v) => v && field.handleChange(v)}
 									>
 										<SelectTrigger>
 											<Globe className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -225,7 +226,7 @@ function SettingsPage() {
 									</Select>
 								</Field>
 							)}
-						/>
+						</form.Field>
 
 						{/* Submit */}
 						<form.Subscribe

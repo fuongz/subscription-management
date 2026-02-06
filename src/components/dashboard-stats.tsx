@@ -135,7 +135,10 @@ export function DashboardStats({
 
 	return (
 		<div className="space-y-6">
-			<div data-tour="stats-cards" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			<div
+				data-tour="stats-cards"
+				className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+			>
 				<Card>
 					<CardHeader>
 						<CardDescription>Monthly Spend</CardDescription>
@@ -215,7 +218,7 @@ export function DashboardStats({
 							<div className="space-y-3">
 								{upcoming.map((s) => {
 									const iconSlug = getIconSlugByName(s.name);
-									const days = daysUntil(s.nextBillingDate!);
+									const days = daysUntil(s.nextBillingDate);
 									const isUrgent = days <= 3;
 									return (
 										<div
@@ -235,7 +238,7 @@ export function DashboardStats({
 												<div>
 													<p className="text-sm font-medium">{s.name}</p>
 													<p className="text-xs text-muted-foreground">
-														{formatDate(s.nextBillingDate!)}
+														{formatDate(s.nextBillingDate)}
 													</p>
 												</div>
 											</div>
