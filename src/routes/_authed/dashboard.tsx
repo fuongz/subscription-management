@@ -18,7 +18,6 @@ export const Route = createFileRoute("/_authed/dashboard")({
 function DashboardPage() {
 	const { subscriptions, preferences } = Route.useLoaderData();
 	const currency = (preferences.currency || "VND") as SupportedCurrency;
-
 	return (
 		<div className="space-y-6">
 			<h1 className="text-2xl font-bold font-serif">Dashboard</h1>

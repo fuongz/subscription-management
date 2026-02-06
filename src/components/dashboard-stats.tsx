@@ -213,7 +213,7 @@ export function DashboardStats({
 							</p>
 						) : (
 							<div className="space-y-3">
-								{upcoming.slice(0, 5).map((s) => {
+								{upcoming.map((s) => {
 									const iconSlug = getIconSlugByName(s.name);
 									const days = daysUntil(s.nextBillingDate!);
 									const isUrgent = days <= 3;
@@ -244,6 +244,9 @@ export function DashboardStats({
 													{formatCurrency(
 														s.price,
 														s.currency as SupportedCurrency,
+														{
+															convertTo: currency as SupportedCurrency,
+														},
 													)}
 												</span>
 												<span
@@ -266,7 +269,9 @@ export function DashboardStats({
 
 				<Card>
 					<CardHeader>
-						<CardTitle className="text-base">Billing Breakdown</CardTitle>
+						<CardTitle className="text-base">
+							Monthly Spend by Category
+						</CardTitle>
 					</CardHeader>
 					<CardContent>
 						{categoryData.length === 0 ? (
