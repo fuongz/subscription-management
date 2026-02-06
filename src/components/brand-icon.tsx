@@ -6,6 +6,9 @@ import {
   siDuolingo,
   siIcloud,
   siGoogle,
+  siCloudflareworkers,
+  siGithubcopilot,
+  siGooglegemini,
 } from 'simple-icons'
 
 const icons: Record<string, { svg: string; hex: string }> = {
@@ -16,6 +19,9 @@ const icons: Record<string, { svg: string; hex: string }> = {
   duolingo: siDuolingo,
   icloud: siIcloud,
   google: siGoogle,
+  cloudflareworkers: siCloudflareworkers,
+  githubcopilot: siGithubcopilot,
+  googlegemini: siGooglegemini,
 }
 
 interface BrandIconProps {

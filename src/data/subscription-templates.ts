@@ -14,6 +14,12 @@ export interface SubscriptionTemplate {
 	color: string;
 	icon: string; // simple-icons slug (e.g. "netflix", "youtube", "anthropic")
 	plans: SubscriptionPlan[];
+	/** Fields that remain editable even when using a template. By default all template fields are disabled. */
+	editableFields?: Array<
+		"name" | "provider" | "planName" | "price" | "billingCycle" | "category"
+	>;
+	/** Skip the plan selection step and go directly to the form */
+	skipPlanSelection?: boolean;
 }
 
 /** Helper: given a USD price, compute VND via exchange rate fallback */
@@ -261,6 +267,127 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 				name: "AI Premium (2 TB + Gemini Advanced)",
 				prices: { USD: 19.99, VND: 122_000 },
 				billingCycle: "monthly",
+			},
+		],
+	},
+	// ─── Google Gemini ─────────────────────────────────────────
+	// USD prices: https://gemini.google/us/subscriptions/?hl=en
+	// VND prices: https://gemini.google/vn/subscriptions/?hl=vi
+	{
+		id: "google-gemini",
+		name: "Google Gemini",
+		provider: "Google LLC",
+		category: "Development",
+		color: "#8E75B2",
+		icon: "googlegemini",
+		plans: [
+			{
+				name: "AI Plus",
+				prices: { USD: 7.99, VND: 132_000 },
+				billingCycle: "monthly",
+			},
+			{
+				name: "AI Pro",
+				prices: { USD: 19.99, VND: 489_000 },
+				billingCycle: "monthly",
+			},
+			{
+				name: "AI Ultra",
+				prices: { USD: 249.99, VND: 6_000_000 },
+				billingCycle: "monthly",
+			},
+		],
+	},
+
+	// ─── Cloudflare Workers ────────────────────────────────────
+	// USD prices: https://developers.cloudflare.com/workers/platform/pricing/
+	// No confirmed VND regional pricing — using conversion fallback
+	{
+		id: "cloudflare-workers",
+		name: "Cloudflare Workers",
+		provider: "Cloudflare Inc.",
+		category: "Development",
+		color: "#F38020",
+		icon: "cloudflareworkers",
+		plans: [
+			{
+				name: "Workers Paid",
+				prices: withFallbackVND(5.0),
+				billingCycle: "monthly",
+			},
+		],
+	},
+
+	// ─── GitHub Copilot ────────────────────────────────────────
+	// USD prices: https://github.com/features/copilot/plans
+	// No confirmed VND regional pricing — using conversion fallback
+	{
+		id: "github-copilot",
+		name: "GitHub Copilot",
+		provider: "GitHub (Microsoft)",
+		category: "Development",
+		color: "#000000",
+		icon: "githubcopilot",
+		plans: [
+			{
+				name: "Pro",
+				prices: withFallbackVND(10.0),
+				billingCycle: "monthly",
+			},
+			{
+				name: "Pro (Annual)",
+				prices: withFallbackVND(100.0),
+				billingCycle: "yearly",
+			},
+			{
+				name: "Business",
+				prices: withFallbackVND(19.0),
+				billingCycle: "monthly",
+			},
+			{
+				name: "Enterprise",
+				prices: withFallbackVND(39.0),
+				billingCycle: "monthly",
+			},
+		],
+	},
+
+	// ─── Domain Renewal ────────────────────────────────────────
+	// Generic template — user fills in provider (Porkbun, Namecheap, etc.) and domain name
+	{
+		id: "domain-renewal",
+		name: "Domain Renewal",
+		provider: "",
+		category: "Domain",
+		color: "#334155",
+		icon: "",
+		editableFields: ["provider", "planName", "price", "billingCycle"],
+		skipPlanSelection: true,
+		plans: [
+			{
+				name: ".com",
+				prices: withFallbackVND(10.0),
+				billingCycle: "yearly",
+			},
+			{
+				name: ".net",
+				prices: withFallbackVND(12.0),
+				billingCycle: "yearly",
+			},
+			{
+				name: ".org",
+				prices: withFallbackVND(12.0),
+				billingCycle: "yearly",
+			},
+			{
+				name: ".dev",
+				prices: withFallbackVND(14.0),
+				billingCycle: "yearly",
+			},
+			{
+				name: ".io",
+				prices: withFallbackVND(33.0),
+				billingCycle: "yearly",
 			},
 		],
 	},

@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatCurrency, type SupportedCurrency } from '@/lib/currency-utils'
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { ArrowLeft, Pencil, Globe } from 'lucide-react'
 import { BrandIcon } from '@/components/brand-icon'
 import { getUserPreferences } from '@/server/user-preferences'
 
@@ -34,9 +34,27 @@ function NewSubscriptionPage() {
   const [defaults, setDefaults] = useState<Partial<CreateSubscriptionInput>>({})
   const [formKey, setFormKey] = useState(0)
 
+  const userCurrency = (preferences.currency || 'VND') as SupportedCurrency
+
   const handleSelectService = (template: SubscriptionTemplate) => {
     setSelectedTemplate(template)
-    setStep('pick-plan')
+    if (template.skipPlanSelection) {
+      const plan = template.plans[0]
+      setDefaults({
+        name: template.name,
+        provider: template.provider,
+        planName: plan?.name || '',
+        price: plan ? plan.prices[userCurrency] : 0,
+        currency: preferences.currency,
+        billingCycle: plan?.billingCycle || 'yearly',
+        category: template.category,
+        status: 'active',
+      })
+      setFormKey((k) => k + 1)
+      setStep('form')
+    } else {
+      setStep('pick-plan')
+    }
   }
 
   const handleSelectCustom = () => {
@@ -45,8 +63,6 @@ function NewSubscriptionPage() {
     setFormKey((k) => k + 1)
     setStep('form')
   }
-
-  const userCurrency = (preferences.currency || 'VND') as SupportedCurrency
 
   const handleSelectPlan = (template: SubscriptionTemplate, plan: SubscriptionPlan) => {
     setDefaults({
@@ -68,7 +84,10 @@ function NewSubscriptionPage() {
       setSelectedTemplate(null)
       setStep('pick-service')
     } else if (step === 'form') {
-      if (selectedTemplate) {
+      if (selectedTemplate?.skipPlanSelection) {
+        setSelectedTemplate(null)
+        setStep('pick-service')
+      } else if (selectedTemplate) {
         setStep('pick-plan')
       } else {
         setStep('pick-service')
@@ -120,7 +139,11 @@ function NewSubscriptionPage() {
             >
               <CardContent className="flex flex-col items-center gap-2 p-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-                  <BrandIcon slug={template.icon} size={28} />
+                  {template.icon ? (
+                    <BrandIcon slug={template.icon} size={28} />
+                  ) : (
+                    <Globe className="h-7 w-7 text-muted-foreground" />
+                  )}
                 </div>
                 <span className="text-sm font-medium text-center">{template.name}</span>
                 <Badge variant="outline" className="text-xs">
@@ -187,6 +210,7 @@ function NewSubscriptionPage() {
               submitLabel="Add Subscription"
               onSubmit={handleSubmit}
               isTemplate={!!selectedTemplate}
+              editableFields={selectedTemplate?.editableFields}
             />
           </CardContent>
         </Card>

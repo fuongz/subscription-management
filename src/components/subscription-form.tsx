@@ -36,6 +36,7 @@ const CATEGORIES = [
   'Productivity',
   'Cloud Storage',
   'Development',
+  'Domain',
   'Education',
   'Health & Fitness',
   'News',
@@ -48,6 +49,8 @@ interface SubscriptionFormProps {
   isLoading?: boolean
   submitLabel?: string
   isTemplate?: boolean
+  /** Fields that remain editable even when isTemplate is true */
+  editableFields?: Array<'name' | 'provider' | 'planName' | 'price' | 'billingCycle' | 'category'>
 }
 
 function computeNextBillingDate(startDate: string, billingCycle: string): string {
@@ -83,7 +86,11 @@ export function SubscriptionForm({
   isLoading,
   submitLabel = 'Save',
   isTemplate = false,
+  editableFields,
 }: SubscriptionFormProps) {
+  const isFieldDisabled = (field: string) =>
+    isTemplate && !(editableFields?.includes(field as any))
+
   const form = useForm({
     defaultValues: {
       name: defaultValues?.name || '',
@@ -139,9 +146,9 @@ export function SubscriptionForm({
           children={(field) => {
             const error = getFieldError(field)
             return (
-              <Field data-invalid={error ? true : undefined} data-disabled={isTemplate || undefined}>
+              <Field data-invalid={error ? true : undefined} data-disabled={isFieldDisabled('name') || undefined}>
                 <FieldLabel htmlFor={field.name}>Service Name *</FieldLabel>
-                <InputGroup data-disabled={isTemplate || undefined}>
+                <InputGroup data-disabled={isFieldDisabled('name') || undefined}>
                   <InputGroupAddon align="inline-start">
                     <InputGroupText>
                       <CreditCard />
@@ -153,7 +160,7 @@ export function SubscriptionForm({
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder="Netflix"
-                    disabled={isTemplate}
+                    disabled={isFieldDisabled('name')}
                     aria-invalid={error ? true : undefined}
                   />
                 </InputGroup>
@@ -167,9 +174,9 @@ export function SubscriptionForm({
         <form.Field
           name="provider"
           children={(field) => (
-            <Field data-disabled={isTemplate || undefined}>
+            <Field data-disabled={isFieldDisabled('provider') || undefined}>
               <FieldLabel htmlFor={field.name}>Provider</FieldLabel>
-              <InputGroup data-disabled={isTemplate || undefined}>
+              <InputGroup data-disabled={isFieldDisabled('provider') || undefined}>
                 <InputGroupAddon align="inline-start">
                   <InputGroupText>
                     <Building2 />
@@ -181,7 +188,7 @@ export function SubscriptionForm({
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="Netflix Inc."
-                  disabled={isTemplate}
+                  disabled={isFieldDisabled('provider')}
                 />
               </InputGroup>
             </Field>
@@ -192,9 +199,9 @@ export function SubscriptionForm({
         <form.Field
           name="planName"
           children={(field) => (
-            <Field data-disabled={isTemplate || undefined}>
+            <Field data-disabled={isFieldDisabled('planName') || undefined}>
               <FieldLabel htmlFor={field.name}>Plan Name</FieldLabel>
-              <InputGroup data-disabled={isTemplate || undefined}>
+              <InputGroup data-disabled={isFieldDisabled('planName') || undefined}>
                 <InputGroupAddon align="inline-start">
                   <InputGroupText>
                     <FileText />
@@ -206,7 +213,7 @@ export function SubscriptionForm({
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="Premium"
-                  disabled={isTemplate}
+                  disabled={isFieldDisabled('planName')}
                 />
               </InputGroup>
             </Field>
@@ -229,9 +236,9 @@ export function SubscriptionForm({
           children={(field) => {
             const error = getFieldError(field)
             return (
-              <Field data-invalid={error ? true : undefined} data-disabled={isTemplate || undefined}>
+              <Field data-invalid={error ? true : undefined} data-disabled={isFieldDisabled('price') || undefined}>
                 <FieldLabel htmlFor={field.name}>Price *</FieldLabel>
-                <InputGroup data-disabled={isTemplate || undefined}>
+                <InputGroup data-disabled={isFieldDisabled('price') || undefined}>
                   <InputGroupAddon align="inline-start">
                     <InputGroupText>
                       <DollarSign />
@@ -246,7 +253,7 @@ export function SubscriptionForm({
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder="9.99"
-                    disabled={isTemplate}
+                    disabled={isFieldDisabled('price')}
                     aria-invalid={error ? true : undefined}
                   />
                 </InputGroup>
@@ -279,12 +286,12 @@ export function SubscriptionForm({
         <form.Field
           name="billingCycle"
           children={(field) => (
-            <Field data-disabled={isTemplate || undefined}>
+            <Field data-disabled={isFieldDisabled('billingCycle') || undefined}>
               <FieldLabel htmlFor={field.name}>Billing Cycle</FieldLabel>
               <Select
                 value={field.state.value}
                 onValueChange={(v) => field.handleChange(v as typeof field.state.value)}
-                disabled={isTemplate}
+                disabled={isFieldDisabled('billingCycle')}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -382,9 +389,9 @@ export function SubscriptionForm({
         <form.Field
           name="category"
           children={(field) => (
-            <Field data-disabled={isTemplate || undefined}>
+            <Field data-disabled={isFieldDisabled('category') || undefined}>
               <FieldLabel htmlFor={field.name}>Category</FieldLabel>
-              <Select value={field.state.value} onValueChange={(v) => field.handleChange(v)} disabled={isTemplate}>
+              <Select value={field.state.value} onValueChange={(v) => field.handleChange(v)} disabled={isFieldDisabled('category')}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
