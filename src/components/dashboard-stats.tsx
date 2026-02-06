@@ -6,6 +6,84 @@ import { DollarSign, CreditCard, TrendingUp, CalendarClock } from 'lucide-react'
 
 type Subscription = typeof subscription.$inferSelect
 
+const CATEGORY_COLORS = [
+  '#6366f1', // indigo
+  '#8b5cf6', // violet
+  '#06b6d4', // cyan
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#ef4444', // red
+  '#ec4899', // pink
+  '#14b8a6', // teal
+]
+
+interface CategoryData {
+  name: string
+  count: number
+  amount: number
+  color: string
+}
+
+function DonutChart({ categories, totalCount }: { categories: CategoryData[]; totalCount: number }) {
+  const size = 140
+  const strokeWidth = 18
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const cx = size / 2
+  const cy = size / 2
+
+  const totalAmount = categories.reduce((sum, c) => sum + c.amount, 0)
+
+  let cumulativeOffset = 0
+  const segments = categories.map((cat) => {
+    const proportion = totalAmount > 0 ? cat.amount / totalAmount : 0
+    const dashLength = proportion * circumference
+    const gap = circumference - dashLength
+    const offset = -cumulativeOffset
+    cumulativeOffset += dashLength
+    return { ...cat, dashLength, gap, offset }
+  })
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {/* Background track */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-muted/30"
+        />
+        {/* Segments */}
+        {segments.map((seg) => (
+          <circle
+            key={seg.name}
+            cx={cx}
+            cy={cy}
+            r={radius}
+            fill="none"
+            stroke={seg.color}
+            strokeWidth={strokeWidth}
+            strokeDasharray={`${seg.dashLength} ${seg.gap}`}
+            strokeDashoffset={seg.offset}
+            strokeLinecap="round"
+            className="transition-all duration-500"
+            style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
+          />
+        ))}
+      </svg>
+      {/* Center text */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-2xl font-bold">{totalCount}</span>
+        <span className="text-[10px] text-muted-foreground">Total Subs</span>
+      </div>
+    </div>
+  )
+}
+
 export function DashboardStats({ subscriptions, currency }: { subscriptions: Subscription[]; currency: SupportedCurrency }) {
   const active = subscriptions.filter((s) => s.status === 'active')
 
@@ -27,14 +105,31 @@ export function DashboardStats({ subscriptions, currency }: { subscriptions: Sub
       return new Date(a.nextBillingDate).getTime() - new Date(b.nextBillingDate).getTime()
     })
 
-  const categories = active.reduce(
+  // Build category data with amounts
+  const categoryMap = active.reduce(
     (acc, s) => {
       const cat = s.category || 'Uncategorized'
-      acc[cat] = (acc[cat] || 0) + 1
+      const converted = convertCurrency(s.price, s.currency as SupportedCurrency, currency)
+      const monthlyAmount =
+        s.billingCycle === 'yearly' ? converted / 12 :
+        s.billingCycle === 'weekly' ? converted * 4.33 :
+        converted
+      if (!acc[cat]) acc[cat] = { count: 0, amount: 0 }
+      acc[cat].count += 1
+      acc[cat].amount += monthlyAmount
       return acc
     },
-    {} as Record<string, number>,
+    {} as Record<string, { count: number; amount: number }>,
   )
+
+  const categoryData: CategoryData[] = Object.entries(categoryMap)
+    .sort(([, a], [, b]) => b.amount - a.amount)
+    .map(([name, data], i) => ({
+      name,
+      count: data.count,
+      amount: data.amount,
+      color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+    }))
 
   return (
     <div className="space-y-6">
@@ -111,21 +206,30 @@ export function DashboardStats({ subscriptions, currency }: { subscriptions: Sub
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">By Category</CardTitle>
+            <CardTitle className="text-base">Billing Breakdown</CardTitle>
           </CardHeader>
           <CardContent>
-            {Object.keys(categories).length === 0 ? (
+            {categoryData.length === 0 ? (
               <p className="text-sm text-muted-foreground">No categories yet</p>
             ) : (
-              <div className="space-y-3">
-                {Object.entries(categories)
-                  .sort(([, a], [, b]) => b - a)
-                  .map(([cat, count]) => (
-                    <div key={cat} className="flex items-center justify-between">
-                      <span className="text-sm">{cat}</span>
-                      <span className="text-sm text-muted-foreground">{count}</span>
+              <div className="flex items-center gap-6">
+                <DonutChart categories={categoryData} totalCount={active.length} />
+                <div className="flex-1 space-y-3">
+                  {categoryData.map((cat) => (
+                    <div key={cat.name} className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: cat.color }}
+                        />
+                        <span className="text-sm truncate">{cat.name}</span>
+                      </div>
+                      <span className="text-sm font-medium whitespace-nowrap">
+                        {formatCurrency(cat.amount, currency)}
+                      </span>
                     </div>
                   ))}
+                </div>
               </div>
             )}
           </CardContent>

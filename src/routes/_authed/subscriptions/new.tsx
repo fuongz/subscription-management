@@ -10,7 +10,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { formatCurrency, convertCurrency, type SupportedCurrency } from '@/lib/currency-utils'
+import { formatCurrency, type SupportedCurrency } from '@/lib/currency-utils'
 import { ArrowLeft, Pencil } from 'lucide-react'
 import { getUserPreferences } from '@/server/user-preferences'
 
@@ -48,12 +48,11 @@ function NewSubscriptionPage() {
   const userCurrency = (preferences.currency || 'VND') as SupportedCurrency
 
   const handleSelectPlan = (template: SubscriptionTemplate, plan: SubscriptionPlan) => {
-    const convertedPrice = convertCurrency(plan.price, 'USD', userCurrency)
     setDefaults({
       name: template.name,
       provider: template.provider,
       planName: plan.name,
-      price: convertedPrice,
+      price: plan.prices[userCurrency],
       currency: preferences.currency,
       billingCycle: plan.billingCycle,
       category: template.category,
@@ -168,7 +167,7 @@ function NewSubscriptionPage() {
                   </p>
                 </div>
                 <span className="text-xl font-bold">
-                  {formatCurrency(convertCurrency(plan.price, 'USD', userCurrency), userCurrency)}
+                  {formatCurrency(plan.prices[userCurrency], userCurrency)}
                   <span className="text-sm font-normal text-muted-foreground">
                     /{plan.billingCycle === 'yearly' ? 'yr' : plan.billingCycle === 'weekly' ? 'wk' : 'mo'}
                   </span>

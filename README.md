@@ -1,4 +1,4 @@
-# SubTracker
+# PhakeSub
 
 A clean, fast subscription tracker built on Cloudflare's edge. Know exactly where your money goes every month.
 
