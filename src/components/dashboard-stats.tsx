@@ -1,18 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { formatCurrency } from '@/lib/currency-utils'
+import { formatCurrency, convertCurrency, type SupportedCurrency } from '@/lib/currency-utils'
 import { daysUntil, formatDate } from '@/lib/date-utils'
 import type { subscription } from '@/db/schema'
 import { DollarSign, CreditCard, TrendingUp, CalendarClock } from 'lucide-react'
 
 type Subscription = typeof subscription.$inferSelect
 
-export function DashboardStats({ subscriptions }: { subscriptions: Subscription[] }) {
+export function DashboardStats({ subscriptions, currency }: { subscriptions: Subscription[]; currency: SupportedCurrency }) {
   const active = subscriptions.filter((s) => s.status === 'active')
 
+  // Convert all amounts to user's currency for totals
   const monthlyTotal = active.reduce((sum, s) => {
-    if (s.billingCycle === 'monthly') return sum + s.price
-    if (s.billingCycle === 'yearly') return sum + s.price / 12
-    if (s.billingCycle === 'weekly') return sum + s.price * 4.33
+    const converted = convertCurrency(s.price, s.currency as SupportedCurrency, currency)
+    if (s.billingCycle === 'monthly') return sum + converted
+    if (s.billingCycle === 'yearly') return sum + converted / 12
+    if (s.billingCycle === 'weekly') return sum + converted * 4.33
     return sum
   }, 0)
 
@@ -43,7 +45,7 @@ export function DashboardStats({ subscriptions }: { subscriptions: Subscription[
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(monthlyTotal)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(monthlyTotal, currency)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -52,7 +54,7 @@ export function DashboardStats({ subscriptions }: { subscriptions: Subscription[
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(yearlyTotal)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(yearlyTotal, currency)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -98,7 +100,7 @@ export function DashboardStats({ subscriptions }: { subscriptions: Subscription[
                       </p>
                     </div>
                     <span className="text-sm font-medium">
-                      {formatCurrency(s.price, s.currency)}
+                      {formatCurrency(s.price, s.currency as SupportedCurrency)}
                     </span>
                   </div>
                 ))}

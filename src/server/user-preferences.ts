@@ -24,7 +24,7 @@ async function getAuthenticatedUser(request: Request) {
 // ─── Zod schemas ────────────────────────────────────────────────
 
 const updatePreferencesSchema = z.object({
-  currency: z.enum(['USD', 'EUR', 'GBP', 'VND', 'JPY']),
+  currency: z.enum(['USD', 'VND']),
   timezone: z.string().min(1).max(100),
 })
 
@@ -44,7 +44,7 @@ export const getUserPreferences = createServerFn({ method: 'GET' }).handler(asyn
     .from(userPreference)
     .where(eq(userPreference.userId, user.id))
 
-  return result[0] || { userId: user.id, currency: 'USD', timezone: 'UTC' }
+  return result[0] || { userId: user.id, currency: 'VND', timezone: 'Asia/Ho_Chi_Minh' }
 })
 
 export const updateUserPreferences = createServerFn({ method: 'POST' })

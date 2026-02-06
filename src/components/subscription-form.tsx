@@ -90,7 +90,7 @@ export function SubscriptionForm({
       provider: defaultValues?.provider || '',
       planName: defaultValues?.planName || '',
       price: defaultValues?.price?.toString() || '',
-      currency: defaultValues?.currency || 'USD',
+      currency: defaultValues?.currency || 'VND',
       billingCycle: (defaultValues?.billingCycle || 'monthly') as 'monthly' | 'yearly' | 'weekly',
       startDate: defaultValues?.startDate || '',
       status: (defaultValues?.status || 'active') as 'active' | 'paused' | 'cancelled',
@@ -267,11 +267,8 @@ export function SubscriptionForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="EUR">EUR</SelectItem>
-                  <SelectItem value="GBP">GBP</SelectItem>
-                  <SelectItem value="VND">VND</SelectItem>
-                  <SelectItem value="JPY">JPY</SelectItem>
+                  <SelectItem value="VND">VND — Vietnamese Dong</SelectItem>
+                  <SelectItem value="USD">USD — US Dollar</SelectItem>
                 </SelectContent>
               </Select>
             </Field>

@@ -88,7 +88,7 @@ function SettingsPage() {
 
         await updateUserPreferences({
           data: {
-            currency: value.currency as 'USD' | 'EUR' | 'GBP' | 'VND' | 'JPY',
+            currency: value.currency as 'USD' | 'VND',
             timezone: value.timezone,
           },
         })
@@ -177,11 +177,8 @@ function SettingsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="USD">USD — US Dollar</SelectItem>
-                      <SelectItem value="EUR">EUR — Euro</SelectItem>
-                      <SelectItem value="GBP">GBP — British Pound</SelectItem>
                       <SelectItem value="VND">VND — Vietnamese Dong</SelectItem>
-                      <SelectItem value="JPY">JPY — Japanese Yen</SelectItem>
+                      <SelectItem value="USD">USD — US Dollar</SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>

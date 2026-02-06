@@ -56,8 +56,8 @@ export const userPreference = sqliteTable('user_preference', {
   userId: text('user_id')
     .primaryKey()
     .references(() => user.id, { onDelete: 'cascade' }),
-  currency: text('currency').notNull().default('USD'),
-  timezone: text('timezone').notNull().default('UTC'),
+  currency: text('currency').notNull().default('VND'),
+  timezone: text('timezone').notNull().default('Asia/Ho_Chi_Minh'),
 })
 
 export const subscription = sqliteTable('subscription', {
@@ -69,7 +69,7 @@ export const subscription = sqliteTable('subscription', {
   provider: text('provider'),
   planName: text('plan_name'),
   price: real('price').notNull(),
-  currency: text('currency').notNull().default('USD'),
+  currency: text('currency').notNull().default('VND'),
   billingCycle: text('billing_cycle', { enum: ['monthly', 'yearly', 'weekly'] })
     .notNull()
     .default('monthly'),

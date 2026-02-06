@@ -1,6 +1,6 @@
 export interface SubscriptionPlan {
 	name: string;
-	price: number;
+	price: number; // in USD
 	billingCycle: "monthly" | "yearly" | "weekly";
 }
 
@@ -13,6 +13,7 @@ export interface SubscriptionTemplate {
 	plans: SubscriptionPlan[];
 }
 
+// All template prices are in USD — converted to user's local currency at display time
 export const subscriptionTemplates: SubscriptionTemplate[] = [
 	// ─── Netflix ───────────────────────────────────────────────
 	{
