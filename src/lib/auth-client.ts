@@ -1,3 +1,4 @@
+import { magicLinkClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
@@ -5,4 +6,7 @@ export const authClient = createAuthClient({
 		typeof window !== "undefined"
 			? window.location.origin
 			: "http://localhost:3002",
+	plugins: [magicLinkClient()],
 });
+
+export const { signIn, signOut, useSession } = authClient;

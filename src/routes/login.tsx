@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Lock, Mail } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,24 +45,25 @@ function getFieldError(field: {
 
 function LoginPage() {
 	const [error, setError] = useState("");
-	const navigate = useNavigate();
+	const [success, setSuccess] = useState("");
 
 	const form = useForm({
 		defaultValues: {
 			email: "",
-			password: "",
 		},
 		onSubmit: async ({ value }) => {
 			setError("");
+			setSuccess("");
+
 			try {
-				const result = await authClient.signIn.email({
+				const result = await authClient.signIn.magicLink({
 					email: value.email,
-					password: value.password,
+					callbackURL: "/dashboard",
 				});
 				if (result.error) {
-					setError(result.error.message || "Invalid credentials");
+					setError(result.error.message || "Failed to send magic link");
 				} else {
-					navigate({ to: "/dashboard" });
+					setSuccess("Check your email for a magic link to sign in!");
 				}
 			} catch {
 				setError("Something went wrong");
@@ -76,7 +77,7 @@ function LoginPage() {
 				<CardHeader>
 					<CardTitle>Sign In</CardTitle>
 					<CardDescription>
-						Enter your email and password to access your account.
+						Enter your email to receive a magic link to sign in.
 					</CardDescription>
 				</CardHeader>
 				<form
@@ -90,6 +91,12 @@ function LoginPage() {
 						{error && (
 							<div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
 								{error}
+							</div>
+						)}
+
+						{success && (
+							<div className="rounded-md bg-green-500/10 p-3 text-sm text-green-600 dark:text-green-400">
+								{success}
 							</div>
 						)}
 
@@ -126,40 +133,6 @@ function LoginPage() {
 								);
 							}}
 						</form.Field>
-
-						<form.Field
-							name="password"
-							validators={{
-								onChange: ({ value }) =>
-									!value ? "Password is required" : undefined,
-							}}
-						>
-							{(field) => {
-								const fieldError = getFieldError(field);
-								return (
-									<Field data-invalid={fieldError ? true : undefined}>
-										<FieldLabel htmlFor={field.name}>Password</FieldLabel>
-										<InputGroup>
-											<InputGroupAddon align="inline-start">
-												<InputGroupText>
-													<Lock />
-												</InputGroupText>
-											</InputGroupAddon>
-											<InputGroupInput
-												id={field.name}
-												type="password"
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-												placeholder="Your password"
-												aria-invalid={fieldError ? true : undefined}
-											/>
-										</InputGroup>
-										{fieldError && <FieldError>{fieldError}</FieldError>}
-									</Field>
-								);
-							}}
-						</form.Field>
 					</CardContent>
 					<CardFooter className="flex flex-col gap-4 mt-4">
 						<form.Subscribe
@@ -171,7 +144,7 @@ function LoginPage() {
 									className="w-full"
 									disabled={!canSubmit || isSubmitting}
 								>
-									{isSubmitting ? "Signing in..." : "Sign In"}
+									{isSubmitting ? "Sending magic link..." : "Send Magic Link"}
 								</Button>
 							)}
 						</form.Subscribe>
@@ -216,13 +189,6 @@ function LoginPage() {
 							</svg>
 							Continue with Google
 						</Button>
-
-						<p className="text-sm text-muted-foreground">
-							Don't have an account?{" "}
-							<Link to="/register" className="text-primary underline">
-								Sign up
-							</Link>
-						</p>
 					</CardFooter>
 				</form>
 			</Card>

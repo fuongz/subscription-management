@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Lock, Mail, User } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,8 +33,11 @@ function getFieldError(field: {
 	if (!field.state.meta.isTouched || field.state.meta.errors.length === 0)
 		return undefined;
 	return field.state.meta.errors
-		.filter((e): e is string | { message: string } =>
-			e !== undefined && (typeof e === "string" || (typeof e === "object" && e !== null && "message" in e))
+		.filter(
+			(e): e is string | { message: string } =>
+				e !== undefined &&
+				(typeof e === "string" ||
+					(typeof e === "object" && e !== null && "message" in e)),
 		)
 		.map((e) => (typeof e === "string" ? e : e.message))
 		.join(", ");
@@ -42,26 +45,25 @@ function getFieldError(field: {
 
 function RegisterPage() {
 	const [error, setError] = useState("");
-	const navigate = useNavigate();
+	const [success, setSuccess] = useState("");
 
 	const form = useForm({
 		defaultValues: {
-			name: "",
 			email: "",
-			password: "",
 		},
 		onSubmit: async ({ value }) => {
 			setError("");
+			setSuccess("");
+
 			try {
-				const result = await authClient.signUp.email({
-					name: value.name,
+				const result = await authClient.signIn.magicLink({
 					email: value.email,
-					password: value.password,
+					callbackURL: "/dashboard",
 				});
 				if (result.error) {
-					setError(result.error.message || "Registration failed");
+					setError(result.error.message || "Failed to send magic link");
 				} else {
-					navigate({ to: "/dashboard" });
+					setSuccess("Check your email for a magic link to sign in!");
 				}
 			} catch {
 				setError("Something went wrong");
@@ -73,9 +75,9 @@ function RegisterPage() {
 		<div className="flex min-h-screen bg-muted items-center justify-center">
 			<Card className="w-full max-w-md">
 				<CardHeader>
-					<CardTitle>Create Account</CardTitle>
+					<CardTitle>Get Started</CardTitle>
 					<CardDescription>
-						Enter your details to create a new account.
+						Enter your email to receive a magic link to sign in or create an account.
 					</CardDescription>
 				</CardHeader>
 				<form
@@ -92,38 +94,11 @@ function RegisterPage() {
 							</div>
 						)}
 
-						<form.Field
-							name="name"
-							validators={{
-								onChange: ({ value }) =>
-									!value ? "Name is required" : undefined,
-							}}
-						>
-							{(field) => {
-								const fieldError = getFieldError(field);
-								return (
-									<Field data-invalid={fieldError ? true : undefined}>
-										<FieldLabel htmlFor={field.name}>Name</FieldLabel>
-										<InputGroup>
-											<InputGroupAddon align="inline-start">
-												<InputGroupText>
-													<User />
-												</InputGroupText>
-											</InputGroupAddon>
-											<InputGroupInput
-												id={field.name}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-												placeholder="Your name"
-												aria-invalid={fieldError ? true : undefined}
-											/>
-										</InputGroup>
-										{fieldError && <FieldError>{fieldError}</FieldError>}
-									</Field>
-								);
-							}}
-						</form.Field>
+						{success && (
+							<div className="rounded-md bg-green-500/10 p-3 text-sm text-green-600 dark:text-green-400">
+								{success}
+							</div>
+						)}
 
 						<form.Field
 							name="email"
@@ -158,44 +133,6 @@ function RegisterPage() {
 								);
 							}}
 						</form.Field>
-
-						<form.Field
-							name="password"
-							validators={{
-								onChange: ({ value }) =>
-									!value
-										? "Password is required"
-										: value.length < 8
-											? "Password must be at least 8 characters"
-											: undefined,
-							}}
-						>
-							{(field) => {
-								const fieldError = getFieldError(field);
-								return (
-									<Field data-invalid={fieldError ? true : undefined}>
-										<FieldLabel htmlFor={field.name}>Password</FieldLabel>
-										<InputGroup>
-											<InputGroupAddon align="inline-start">
-												<InputGroupText>
-													<Lock />
-												</InputGroupText>
-											</InputGroupAddon>
-											<InputGroupInput
-												id={field.name}
-												type="password"
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-												placeholder="At least 8 characters"
-												aria-invalid={fieldError ? true : undefined}
-											/>
-										</InputGroup>
-										{fieldError && <FieldError>{fieldError}</FieldError>}
-									</Field>
-								);
-							}}
-						</form.Field>
 					</CardContent>
 					<CardFooter className="flex flex-col gap-4 mt-4">
 						<form.Subscribe
@@ -207,7 +144,7 @@ function RegisterPage() {
 									className="w-full"
 									disabled={!canSubmit || isSubmitting}
 								>
-									{isSubmitting ? "Creating account..." : "Create Account"}
+									{isSubmitting ? "Sending magic link..." : "Send Magic Link"}
 								</Button>
 							)}
 						</form.Subscribe>
@@ -234,7 +171,7 @@ function RegisterPage() {
 						>
 							<svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
 								<path
-									d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+									d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.10z"
 									fill="#4285F4"
 								/>
 								<path
