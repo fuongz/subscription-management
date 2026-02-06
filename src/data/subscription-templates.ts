@@ -12,6 +12,7 @@ export interface SubscriptionTemplate {
 	provider: string;
 	category: string;
 	color: string;
+	icon: string; // simple-icons slug (e.g. "netflix", "youtube", "anthropic")
 	plans: SubscriptionPlan[];
 }
 
@@ -31,6 +32,7 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		provider: "Netflix Inc.",
 		category: "Entertainment",
 		color: "#E50914",
+		icon: "netflix",
 		plans: [
 			{
 				name: "Mobile (480p)",
@@ -63,6 +65,7 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		provider: "Google LLC",
 		category: "Entertainment",
 		color: "#FF0000",
+		icon: "youtube",
 		plans: [
 			{
 				name: "Individual",
@@ -85,6 +88,7 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		provider: "Anthropic",
 		category: "Development",
 		color: "#D97757",
+		icon: "anthropic",
 		plans: [
 			{
 				name: "Pro",
@@ -117,6 +121,7 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		provider: "1Password (AgileBits)",
 		category: "Productivity",
 		color: "#0572EC",
+		icon: "1password",
 		plans: [
 			{
 				name: "Individual",
@@ -149,6 +154,7 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		provider: "Duolingo Inc.",
 		category: "Education",
 		color: "#58CC02",
+		icon: "duolingo",
 		plans: [
 			{
 				name: "Super",
@@ -191,6 +197,7 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		provider: "Apple Inc.",
 		category: "Cloud Storage",
 		color: "#007AFF",
+		icon: "icloud",
 		plans: [
 			{
 				name: "50 GB",
@@ -228,6 +235,7 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		provider: "Google LLC",
 		category: "Cloud Storage",
 		color: "#4285F4",
+		icon: "google",
 		plans: [
 			{
 				name: "100 GB",
@@ -257,3 +265,12 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		],
 	},
 ];
+
+/** Look up the icon slug for a subscription by name (case-insensitive match against template names) */
+export function getIconSlugByName(name: string): string | undefined {
+	const lower = name.toLowerCase();
+	const match = subscriptionTemplates.find(
+		(t) => t.name.toLowerCase() === lower || t.id === lower,
+	);
+	return match?.icon;
+}

@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatCurrency, type SupportedCurrency } from '@/lib/currency-utils'
 import { ArrowLeft, Pencil } from 'lucide-react'
+import { BrandIcon } from '@/components/brand-icon'
 import { getUserPreferences } from '@/server/user-preferences'
 
 export const Route = createFileRoute('/_authed/subscriptions/new')({
@@ -118,11 +119,8 @@ function NewSubscriptionPage() {
               onClick={() => handleSelectService(template)}
             >
               <CardContent className="flex flex-col items-center gap-2 p-4">
-                <div
-                  className="flex h-12 w-12 items-center justify-center rounded-xl text-white text-lg font-bold"
-                  style={{ backgroundColor: template.color }}
-                >
-                  {template.name.charAt(0)}
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
+                  <BrandIcon slug={template.icon} size={28} />
                 </div>
                 <span className="text-sm font-medium text-center">{template.name}</span>
                 <Badge variant="outline" className="text-xs">

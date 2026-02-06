@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { subscription } from "@/db/schema";
 import { formatCurrency, type SupportedCurrency } from "@/lib/currency-utils";
 import { daysUntil, formatDate } from "@/lib/date-utils";
+import { getIconSlugByName } from "@/data/subscription-templates";
+import { BrandIcon } from "@/components/brand-icon";
 
 type Subscription = typeof subscription.$inferSelect;
 
@@ -15,11 +17,23 @@ const statusColors: Record<string, "default" | "secondary" | "destructive"> = {
 
 export function SubscriptionCard({ sub }: { sub: Subscription }) {
 	const daysLeft = sub.nextBillingDate ? daysUntil(sub.nextBillingDate) : null;
+	const iconSlug = getIconSlugByName(sub.name);
 	return (
 		<Link to="/subscriptions/$id" params={{ id: sub.id }}>
 			<Card className="transition-shadow hover:shadow-md">
 				<CardHeader className="flex flex-row items-center justify-between pb-2">
-					<CardTitle className="text-base font-medium">{sub.name}</CardTitle>
+					<div className="flex items-center gap-2.5">
+						{iconSlug ? (
+							<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
+								<BrandIcon slug={iconSlug} size={18} />
+							</div>
+						) : (
+							<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
+								{sub.name.charAt(0)}
+							</div>
+						)}
+						<CardTitle className="text-base font-medium">{sub.name}</CardTitle>
+					</div>
 					<Badge variant={statusColors[sub.status]}>{sub.status}</Badge>
 				</CardHeader>
 				<CardContent>

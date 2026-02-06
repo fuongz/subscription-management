@@ -3,6 +3,8 @@ import { formatCurrency, convertCurrency, type SupportedCurrency } from '@/lib/c
 import { daysUntil, formatDate } from '@/lib/date-utils'
 import type { subscription } from '@/db/schema'
 import { DollarSign, CreditCard, TrendingUp, CalendarClock } from 'lucide-react'
+import { getIconSlugByName } from '@/data/subscription-templates'
+import { BrandIcon } from '@/components/brand-icon'
 
 type Subscription = typeof subscription.$inferSelect
 
@@ -186,19 +188,40 @@ export function DashboardStats({ subscriptions, currency }: { subscriptions: Sub
               <p className="text-sm text-muted-foreground">No upcoming renewals</p>
             ) : (
               <div className="space-y-3">
-                {upcoming.slice(0, 5).map((s) => (
-                  <div key={s.id} className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{s.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(s.nextBillingDate!)}
-                      </p>
+                {upcoming.slice(0, 5).map((s) => {
+                  const iconSlug = getIconSlugByName(s.name)
+                  const days = daysUntil(s.nextBillingDate!)
+                  const isUrgent = days <= 3
+                  return (
+                    <div key={s.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        {iconSlug ? (
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted">
+                            <BrandIcon slug={iconSlug} size={16} />
+                          </div>
+                        ) : (
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xs font-bold text-primary">
+                            {s.name.charAt(0)}
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm font-medium">{s.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(s.nextBillingDate!)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-0.5">
+                        <span className="text-sm font-medium">
+                          {formatCurrency(s.price, s.currency as SupportedCurrency)}
+                        </span>
+                        <span className={`text-xs ${isUrgent ? 'font-medium text-destructive' : 'text-muted-foreground'}`}>
+                          {days === 0 ? 'Today' : days === 1 ? 'Tomorrow' : `${days}d left`}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-sm font-medium">
-                      {formatCurrency(s.price, s.currency as SupportedCurrency)}
-                    </span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </CardContent>
