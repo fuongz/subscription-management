@@ -20,7 +20,7 @@ export const Route = createRootRoute({
 		meta: [
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
-			{ title: "PhakeSub - Subscription Management" },
+			{ title: "Phake Subscription - Subscription Management" },
 			{
 				httpEquiv: "Content-Security-Policy",
 				content: [
@@ -77,7 +77,7 @@ function RootComponent() {
 				<header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
 					<SidebarTrigger className="-ml-1" />
 					<span className="text-sm font-medium text-muted-foreground">
-						PhakeSub
+						Phake Subscription
 					</span>
 				</header>
 				<main className="flex-1 px-6 py-6">

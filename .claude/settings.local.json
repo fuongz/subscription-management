@@ -5,7 +5,9 @@
       "WebFetch(domain:www.better-auth.com)",
       "Bash(pnpm create @tanstack/start@latest:*)",
       "Bash(bun add:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(bunx shadcn@latest add chart:*)"
     ]
   }
 }

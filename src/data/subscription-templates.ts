@@ -11,7 +11,6 @@ export interface SubscriptionTemplate {
 	name: string;
 	provider: string;
 	category: string;
-	color: string;
 	icon: string; // simple-icons slug (e.g. "netflix", "youtube", "anthropic")
 	plans: SubscriptionPlan[];
 	/** Fields that remain editable even when using a template. By default all template fields are disabled. */
@@ -37,7 +36,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "Netflix",
 		provider: "Netflix Inc.",
 		category: "Entertainment",
-		color: "#E50914",
 		icon: "netflix",
 		plans: [
 			{
@@ -70,7 +68,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "YouTube Premium",
 		provider: "Google LLC",
 		category: "Entertainment",
-		color: "#FF0000",
 		icon: "youtube",
 		plans: [
 			{
@@ -86,6 +83,73 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		],
 	},
 
+	// ─── Spotify ───────────────────────────────────────────────
+	// VND prices: https://www.spotify.com/vn-en/premium/#plans
+	// USD prices: https://www.spotify.com/us/premium
+	{
+		id: "spotify",
+		name: "Spotify",
+		provider: "Spotify AB",
+		category: "Entertainment",
+		icon: "spotify",
+		plans: [
+			{
+				name: "Premium Individual",
+				prices: { USD: 12.99, VND: 65_000 },
+				billingCycle: "monthly",
+			},
+			{
+				name: "Premium Student",
+				prices: { USD: 6.99, VND: 33_000 },
+				billingCycle: "monthly",
+			},
+			{
+				name: "Premium Duo",
+				prices: {
+					USD: 18.99,
+					VND: Math.round(convertCurrency(18.99, "USD", "VND")),
+				},
+				billingCycle: "monthly",
+			},
+			{
+				name: "Premium Family",
+				prices: {
+					USD: 21.99,
+					VND: Math.round(convertCurrency(21.99, "USD", "VND")),
+				},
+				billingCycle: "monthly",
+			},
+		],
+	},
+
+	// ─── Apple Music ───────────────────────────────────────────
+	// VND prices: https://www.apple.com/vn/apple-music/
+	// USD prices: https://www.apple.com/apple-music/
+	{
+		id: "apple-music",
+		name: "Apple Music",
+		provider: "Apple Inc.",
+		category: "Entertainment",
+		icon: "applemusic",
+		plans: [
+			{
+				name: "Individual",
+				prices: { USD: 10.99, VND: 65_000 },
+				billingCycle: "monthly",
+			},
+			{
+				name: "Student",
+				prices: { USD: 5.99, VND: 35_000 },
+				billingCycle: "monthly",
+			},
+			{
+				name: "Family (up to 6)",
+				prices: { USD: 16.99, VND: 99_000 },
+				billingCycle: "monthly",
+			},
+		],
+	},
+
 	// ─── Claude (Anthropic) ────────────────────────────────────
 	// No confirmed VND regional pricing — using conversion fallback
 	{
@@ -93,7 +157,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "Claude",
 		provider: "Anthropic",
 		category: "Development",
-		color: "#D97757",
 		icon: "anthropic",
 		plans: [
 			{
@@ -126,7 +189,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "1Password",
 		provider: "1Password (AgileBits)",
 		category: "Productivity",
-		color: "#0572EC",
 		icon: "1password",
 		plans: [
 			{
@@ -152,6 +214,29 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		],
 	},
 
+	// ─── Canva Pro ─────────────────────────────────────────────
+	// USD prices: https://www.canva.com/pricing/
+	// No confirmed VND regional pricing — using conversion fallback
+	{
+		id: "canva-pro",
+		name: "Canva Pro",
+		provider: "Canva Pty Ltd",
+		category: "Productivity",
+		icon: "canva",
+		plans: [
+			{
+				name: "Pro (Monthly)",
+				prices: withFallbackVND(15.0),
+				billingCycle: "monthly",
+			},
+			{
+				name: "Pro (Annual)",
+				prices: withFallbackVND(120.0),
+				billingCycle: "yearly",
+			},
+		],
+	},
+
 	// ─── Duolingo ──────────────────────────────────────────────
 	// No confirmed VND regional pricing — using conversion fallback
 	{
@@ -159,7 +244,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "Duolingo",
 		provider: "Duolingo Inc.",
 		category: "Education",
-		color: "#58CC02",
 		icon: "duolingo",
 		plans: [
 			{
@@ -202,7 +286,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "iCloud+",
 		provider: "Apple Inc.",
 		category: "Cloud Storage",
-		color: "#007AFF",
 		icon: "icloud",
 		plans: [
 			{
@@ -240,7 +323,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "Google One",
 		provider: "Google LLC",
 		category: "Cloud Storage",
-		color: "#4285F4",
 		icon: "google",
 		plans: [
 			{
@@ -278,7 +360,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "Google Gemini",
 		provider: "Google LLC",
 		category: "Development",
-		color: "#8E75B2",
 		icon: "googlegemini",
 		plans: [
 			{
@@ -307,7 +388,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "Cloudflare Workers",
 		provider: "Cloudflare Inc.",
 		category: "Development",
-		color: "#F38020",
 		icon: "cloudflareworkers",
 		plans: [
 			{
@@ -326,7 +406,6 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "GitHub Copilot",
 		provider: "GitHub (Microsoft)",
 		category: "Development",
-		color: "#000000",
 		icon: "githubcopilot",
 		plans: [
 			{
@@ -352,6 +431,131 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		],
 	},
 
+	// ─── ChatGPT Plus ──────────────────────────────────────────
+	// USD prices: https://chatgpt.com/pricing/
+	// No confirmed VND regional pricing — using conversion fallback
+	{
+		id: "chatgpt",
+		name: "ChatGPT",
+		provider: "OpenAI",
+		category: "Development",
+		icon: "openai",
+		plans: [
+			{
+				name: "Plus",
+				prices: withFallbackVND(20.0),
+				billingCycle: "monthly",
+			},
+			{
+				name: "Pro",
+				prices: withFallbackVND(200.0),
+				billingCycle: "monthly",
+			},
+		],
+	},
+
+	// ─── Vercel ────────────────────────────────────────────────
+	// USD prices: https://vercel.com/pricing
+	// No confirmed VND regional pricing — using conversion fallback
+	{
+		id: "vercel",
+		name: "Vercel",
+		provider: "Vercel Inc.",
+		category: "Development",
+		icon: "vercel",
+		plans: [
+			{
+				name: "Pro (per member)",
+				prices: withFallbackVND(20.0),
+				billingCycle: "monthly",
+			},
+		],
+	},
+
+	// ─── Supabase ──────────────────────────────────────────────
+	// USD prices: https://supabase.com/pricing
+	// No confirmed VND regional pricing — using conversion fallback
+	{
+		id: "supabase",
+		name: "Supabase",
+		provider: "Supabase Inc.",
+		category: "Development",
+		icon: "supabase",
+		plans: [
+			{
+				name: "Pro",
+				prices: withFallbackVND(25.0),
+				billingCycle: "monthly",
+			},
+		],
+	},
+
+	// ─── JetBrains ─────────────────────────────────────────────
+	// USD prices: https://www.jetbrains.com/store/
+	// No confirmed VND regional pricing — using conversion fallback
+	{
+		id: "jetbrains",
+		name: "JetBrains All Products Pack",
+		provider: "JetBrains s.r.o.",
+		category: "Development",
+		icon: "jetbrains",
+		plans: [
+			{
+				name: "Individual (Monthly)",
+				prices: withFallbackVND(26.0),
+				billingCycle: "monthly",
+			},
+			{
+				name: "Individual (Annual)",
+				prices: withFallbackVND(259.0),
+				billingCycle: "yearly",
+			},
+		],
+	},
+
+	// ─── PlayStation Plus ──────────────────────────────────────
+	// USD prices: https://www.playstation.com/en-us/ps-plus/
+	// No confirmed VND regional pricing — using conversion fallback
+	{
+		id: "playstation-plus",
+		name: "PlayStation Plus",
+		provider: "Sony Interactive Entertainment",
+		category: "Gaming",
+		icon: "playstation",
+		plans: [
+			{
+				name: "Essential (Monthly)",
+				prices: withFallbackVND(10.0),
+				billingCycle: "monthly",
+			},
+			{
+				name: "Essential (Annual)",
+				prices: withFallbackVND(80.0),
+				billingCycle: "yearly",
+			},
+			{
+				name: "Extra (Monthly)",
+				prices: withFallbackVND(15.0),
+				billingCycle: "monthly",
+			},
+			{
+				name: "Extra (Annual)",
+				prices: withFallbackVND(135.0),
+				billingCycle: "yearly",
+			},
+			{
+				name: "Premium (Monthly)",
+				prices: withFallbackVND(18.0),
+				billingCycle: "monthly",
+			},
+			{
+				name: "Premium (Annual)",
+				prices: withFallbackVND(160.0),
+				billingCycle: "yearly",
+			},
+		],
+	},
+
 	// ─── Domain Renewal ────────────────────────────────────────
 	// Generic template — user fills in provider (Porkbun, Namecheap, etc.) and domain name
 	{
@@ -359,37 +563,10 @@ export const subscriptionTemplates: SubscriptionTemplate[] = [
 		name: "Domain Renewal",
 		provider: "",
 		category: "Domain",
-		color: "#334155",
 		icon: "",
 		editableFields: ["provider", "planName", "price", "billingCycle"],
 		skipPlanSelection: true,
-		plans: [
-			{
-				name: ".com",
-				prices: withFallbackVND(10.0),
-				billingCycle: "yearly",
-			},
-			{
-				name: ".net",
-				prices: withFallbackVND(12.0),
-				billingCycle: "yearly",
-			},
-			{
-				name: ".org",
-				prices: withFallbackVND(12.0),
-				billingCycle: "yearly",
-			},
-			{
-				name: ".dev",
-				prices: withFallbackVND(14.0),
-				billingCycle: "yearly",
-			},
-			{
-				name: ".io",
-				prices: withFallbackVND(33.0),
-				billingCycle: "yearly",
-			},
-		],
+		plans: [],
 	},
 ];
 

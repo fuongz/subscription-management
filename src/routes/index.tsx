@@ -38,10 +38,13 @@ function LandingPage() {
 				transition={{ ...gentle, delay: 0.1 }}
 				className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5"
 			>
-				<span className="text-lg font-semibold tracking-tight text-[#1A3A2A]">
-					Subscription Management
-				</span>
 				<nav className="hidden items-center gap-8 sm:flex">
+					<a
+						href="/"
+						className="text-sm text-[#5A7A6A] transition-colors hover:text-[#1A3A2A]"
+					>
+						Home
+					</a>
 					<a
 						href="#features"
 						className="text-sm text-[#5A7A6A] transition-colors hover:text-[#1A3A2A]"
@@ -242,6 +245,37 @@ function LandingPage() {
 								Get started
 								<ArrowRight className="h-4 w-4" />
 							</Link>
+						</motion.div>
+					</motion.div>
+
+					<motion.div variants={fadeUp} className="relative mt-8 sm:p-12">
+						<motion.blockquote
+							variants={fadeUp}
+							className="relative text-left text-xl leading-relaxed text-[#2D6A4F] sm:text-xl"
+						>
+							<p className="font-serif relative pl-5">
+								<span className="font-serif absolute left-0 text-4xl mr-2 text-[#40916C] opacity-30">
+									"
+								</span>
+								I couldn't figure out why I was constantly broke, until I
+								discovered all these random subscriptions charging me for stuff
+								I totally forgot I even signed up for!
+								<span className="ml-2 absolute font-serif text-4xl text-[#40916C] opacity-30">
+									"
+								</span>
+							</p>
+						</motion.blockquote>
+						<motion.div
+							variants={fadeUp}
+							className="mt-6 flex text-left items-center gap-3"
+						>
+							<div className="h-8 w-8 rounded-full overflow-hidden bg-gradient-to-br from-[#2D6A4F] to-[#40916C]">
+								<img src="/fuongz.jpg" alt="Fuongz" className="relative" />
+							</div>
+							<div>
+								<p className="text-sm font-semibold text-[#1A3A2A]">Fuongz</p>
+								<p className="text-xs text-[#6B8F7B]">Creator of this app</p>
+							</div>
 						</motion.div>
 					</motion.div>
 				</div>

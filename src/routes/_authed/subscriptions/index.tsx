@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { SubscriptionCard } from "@/components/subscription-card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -29,10 +30,11 @@ function SubscriptionsPage() {
 	const [filter, setFilter] = useState("all");
 	const userCurrency = (preferences.currency || "VND") as SupportedCurrency;
 
-	const filtered =
-		filter === "all"
-			? subscriptions
-			: subscriptions.filter((s) => s.status === filter);
+	// Apply both status and category filters
+	const filtered = subscriptions.filter((s) => {
+		const statusMatch = filter === "all" || s.status === filter;
+		return statusMatch;
+	});
 
 	const active = subscriptions.filter((s) => s.status === "active");
 	const monthlyTotal = active.reduce((sum, s) => {
@@ -47,13 +49,23 @@ function SubscriptionsPage() {
 		return sum;
 	}, 0);
 
+	const numberOfCancelled = subscriptions.filter(
+		(s) => s.status === "cancelled",
+	).length;
+	const numberOfPaused = subscriptions.filter(
+		(s) => s.status === "paused",
+	).length;
+	const numberOfActive = subscriptions.filter(
+		(s) => s.status === "active",
+	).length;
+
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
 				<div>
-					<h1 className="text-2xl font-bold">Subscriptions</h1>
+					<h1 className="text-2xl font-bold font-serif">Subscriptions</h1>
 					{active.length > 0 && (
-						<p className="text-sm text-muted-foreground">
+						<p className="text-sm text-muted-foreground mt-1">
 							{formatCurrency(monthlyTotal, userCurrency)}/mo across{" "}
 							{active.length} active
 						</p>
@@ -69,16 +81,35 @@ function SubscriptionsPage() {
 
 			<Tabs value={filter} onValueChange={setFilter}>
 				<TabsList>
-					<TabsTrigger value="all">All ({subscriptions.length})</TabsTrigger>
+					<TabsTrigger value="all">
+						All
+						<Badge className="text-[10px] ml-1 p-0 size-4 rounded-full">
+							{subscriptions.length}
+						</Badge>
+					</TabsTrigger>
 					<TabsTrigger value="active">
-						Active ({subscriptions.filter((s) => s.status === "active").length})
+						Active
+						{numberOfActive > 0 && (
+							<Badge className="text-[10px] ml-1 p-0 size-4 rounded-full">
+								{numberOfActive}
+							</Badge>
+						)}
 					</TabsTrigger>
 					<TabsTrigger value="paused">
-						Paused ({subscriptions.filter((s) => s.status === "paused").length})
+						Paused
+						{numberOfPaused > 0 && (
+							<Badge className="text-[10px] ml-1 p-0 size-4 rounded-full">
+								{numberOfPaused}
+							</Badge>
+						)}
 					</TabsTrigger>
 					<TabsTrigger value="cancelled">
-						Cancelled (
-						{subscriptions.filter((s) => s.status === "cancelled").length})
+						Cancelled
+						{numberOfCancelled > 0 && (
+							<Badge className="text-[10px] ml-1 p-0 size-4 rounded-full">
+								{numberOfCancelled}
+							</Badge>
+						)}
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent value={filter}>

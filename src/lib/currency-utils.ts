@@ -10,7 +10,11 @@ const LOCALE_MAP: Record<SupportedCurrency, string> = {
 /**
  * Format an amount in the given currency using the appropriate locale.
  */
-export function formatCurrency(amount: number, currency: SupportedCurrency = 'VND'): string {
+export function formatCurrency(
+  amount: number,
+  currency: SupportedCurrency = 'VND',
+  options?: { compact?: boolean }
+): string {
   const locale = LOCALE_MAP[currency] || 'vi-VN'
   const fractionDigits = currency === 'VND' ? 0 : 2
 
@@ -19,6 +23,8 @@ export function formatCurrency(amount: number, currency: SupportedCurrency = 'VN
     currency,
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
+    notation: options?.compact ? 'compact' : 'standard',
+    compactDisplay: options?.compact ? 'short' : undefined,
   }).format(amount)
 }
 
