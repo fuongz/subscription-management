@@ -1,0 +1,140 @@
+# ─── Dependencies ────────────────────────────────────────────────
+node_modules
+bower_components
+jspm_packages/
+web_modules/
+
+# ─── Environment & Secrets ───────────────────────────────────────
+.env
+.env.*
+!.env.example
+.dev.vars
+*.pem
+*.key
+*.cert
+
+# ─── Build Outputs ───────────────────────────────────────────────
+dist
+dist-ssr
+build/
+out/
+*.tgz
+
+# ─── Framework-Specific ─────────────────────────────────────────
+# TanStack Start / Vinxi
+.tanstack
+.vinxi
+.output
+.nitro
+
+# Vite
+.vite/
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Cloudflare / Wrangler
+.wrangler
+.mf/
+worker/
+workers-site/
+
+# ─── Database (D1 local dev) ────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# ─── Logs & Diagnostics ─────────────────────────────────────────
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ─── Testing & Coverage ─────────────────────────────────────────
+coverage
+*.lcov
+.nyc_output
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.vitest/
+
+# ─── TypeScript ──────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Package Manager ────────────────────────────────────────────
+.npm
+.yarn-integrity
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.cache
+.eslintcache
+.stylelintcache
+
+# ─── Runtime ─────────────────────────────────────────────────────
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ─── OS Files ────────────────────────────────────────────────────
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ─── Editor / IDE ───────────────────────────────────────────────
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# JetBrains (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+tags
+
+# ─── Temporary & Misc ───────────────────────────────────────────
+*.tmp
+*.temp
+.temp/
+tmp/
+*.bak
+*.swp
+*.swo
+count.txt
+todos.json

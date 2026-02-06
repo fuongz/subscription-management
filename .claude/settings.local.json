@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__116318db-df5a-4166-a58e-a1e5ea349ecd__query-docs",
+      "WebFetch(domain:www.better-auth.com)",
+      "Bash(pnpm create @tanstack/start@latest:*)",
+      "Bash(bun add:*)"
+    ]
+  }
+}

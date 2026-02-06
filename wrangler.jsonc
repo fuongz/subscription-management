@@ -1,0 +1,22 @@
+{
+	"name": "subscription-managements",
+	"compatibility_date": "2025-04-01",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "@tanstack/react-start/server-entry",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "subscription-managements-db",
+			"database_id": "dd063e5e-9dd9-4c46-8cca-e11d29f629aa",
+			"migrations_dir": "src/db/migrations"
+		}
+	],
+	"preview_urls": false,
+	"workers_dev": false,
+	"routes": [
+		{
+			"pattern": "sub.phake.app",
+			"custom_domain": true
+		}
+	]
+}
