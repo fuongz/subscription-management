@@ -13,6 +13,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedSubscriptionsIndexRouteImport } from './routes/_authed/subscriptions/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -37,6 +38,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedSettingsRoute = AuthedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   id: '/dashboard',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/settings': typeof AuthedSettingsRoute
   '/subscriptions/$id': typeof AuthedSubscriptionsIdRoute
   '/subscriptions/new': typeof AuthedSubscriptionsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/settings': typeof AuthedSettingsRoute
   '/subscriptions/$id': typeof AuthedSubscriptionsIdRoute
   '/subscriptions/new': typeof AuthedSubscriptionsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/settings': typeof AuthedSettingsRoute
   '/_authed/subscriptions/$id': typeof AuthedSubscriptionsIdRoute
   '/_authed/subscriptions/new': typeof AuthedSubscriptionsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/settings'
     | '/subscriptions/$id'
     | '/subscriptions/new'
     | '/api/auth/$'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/settings'
     | '/subscriptions/$id'
     | '/subscriptions/new'
     | '/api/auth/$'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/_authed/dashboard'
+    | '/_authed/settings'
     | '/_authed/subscriptions/$id'
     | '/_authed/subscriptions/new'
     | '/api/auth/$'
@@ -169,6 +181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/settings': {
+      id: '/_authed/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
     '/_authed/dashboard': {
       id: '/_authed/dashboard'
       path: '/dashboard'
@@ -209,6 +228,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthedRouteRouteChildren {
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedSettingsRoute: typeof AuthedSettingsRoute
   AuthedSubscriptionsIdRoute: typeof AuthedSubscriptionsIdRoute
   AuthedSubscriptionsNewRoute: typeof AuthedSubscriptionsNewRoute
   AuthedSubscriptionsIndexRoute: typeof AuthedSubscriptionsIndexRoute
@@ -216,6 +236,7 @@ interface AuthedRouteRouteChildren {
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedSettingsRoute: AuthedSettingsRoute,
   AuthedSubscriptionsIdRoute: AuthedSubscriptionsIdRoute,
   AuthedSubscriptionsNewRoute: AuthedSubscriptionsNewRoute,
   AuthedSubscriptionsIndexRoute: AuthedSubscriptionsIndexRoute,

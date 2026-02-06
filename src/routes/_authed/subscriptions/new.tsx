@@ -12,14 +12,20 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatCurrency } from '@/lib/currency-utils'
 import { ArrowLeft, Pencil } from 'lucide-react'
+import { getUserPreferences } from '@/server/user-preferences'
 
 export const Route = createFileRoute('/_authed/subscriptions/new')({
+  loader: async () => {
+    const preferences = await getUserPreferences()
+    return { preferences }
+  },
   component: NewSubscriptionPage,
 })
 
 type Step = 'pick-service' | 'pick-plan' | 'form'
 
 function NewSubscriptionPage() {
+  const { preferences } = Route.useLoaderData()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<Step>('pick-service')
@@ -34,7 +40,7 @@ function NewSubscriptionPage() {
 
   const handleSelectCustom = () => {
     setSelectedTemplate(null)
-    setDefaults({})
+    setDefaults({ currency: preferences.currency })
     setFormKey((k) => k + 1)
     setStep('form')
   }
@@ -45,7 +51,7 @@ function NewSubscriptionPage() {
       provider: template.provider,
       planName: plan.name,
       price: plan.price,
-      currency: 'USD',
+      currency: preferences.currency,
       billingCycle: plan.billingCycle,
       category: template.category,
       status: 'active',

@@ -5,8 +5,15 @@ import {
 	Scripts,
 	useRouterState,
 } from "@tanstack/react-router";
-import { Nav } from "@/components/nav";
+import { AppSidebar } from "@/components/app-sidebar";
+import {
+	SidebarInset,
+	SidebarProvider,
+	SidebarTrigger,
+} from "@/components/ui/sidebar";
 import appCss from "../styles.css?url";
+
+const PUBLIC_PATHS = ["/", "/login", "/register"];
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -57,18 +64,26 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const isLanding = pathname === "/";
+	const isPublic = PUBLIC_PATHS.includes(pathname);
 
-	if (isLanding) {
+	if (isPublic) {
 		return <Outlet />;
 	}
 
 	return (
-		<>
-			<Nav />
-			<main className="mx-auto max-w-5xl px-4 py-6">
-				<Outlet />
-			</main>
-		</>
+		<SidebarProvider>
+			<AppSidebar />
+			<SidebarInset>
+				<header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+					<SidebarTrigger className="-ml-1" />
+					<span className="text-sm font-medium text-muted-foreground">
+						PhakeSub
+					</span>
+				</header>
+				<main className="flex-1 px-6 py-6">
+					<Outlet />
+				</main>
+			</SidebarInset>
+		</SidebarProvider>
 	);
 }

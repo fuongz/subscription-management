@@ -52,6 +52,14 @@ export const verification = sqliteTable('verification', {
 })
 
 // App tables
+export const userPreference = sqliteTable('user_preference', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  currency: text('currency').notNull().default('USD'),
+  timezone: text('timezone').notNull().default('UTC'),
+})
+
 export const subscription = sqliteTable('subscription', {
   id: text('id').primaryKey(),
   userId: text('user_id')
