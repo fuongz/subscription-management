@@ -5,6 +5,7 @@ import { SubscriptionCard } from "@/components/subscription-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAppTour } from "@/hooks/use-app-tour";
 import {
 	convertCurrency,
 	formatCurrency,
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/_authed/subscriptions/")({
 
 function SubscriptionsPage() {
 	const { subscriptions, preferences } = Route.useLoaderData();
+	useAppTour({ page: "subscriptions" });
 
 	const [filter, setFilter] = useState("all");
 	const userCurrency = (preferences.currency || "VND") as SupportedCurrency;
@@ -62,7 +64,7 @@ function SubscriptionsPage() {
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
-				<div>
+				<div data-tour="subscriptions-header">
 					<h1 className="text-2xl font-bold font-serif">Subscriptions</h1>
 					{active.length > 0 && (
 						<p className="text-sm text-muted-foreground mt-1">
@@ -72,7 +74,7 @@ function SubscriptionsPage() {
 					)}
 				</div>
 				<Link to="/subscriptions/new">
-					<Button>
+					<Button data-tour="add-subscription-btn">
 						<Plus className="mr-2 h-4 w-4" />
 						Add Subscription
 					</Button>
@@ -80,7 +82,7 @@ function SubscriptionsPage() {
 			</div>
 
 			<Tabs value={filter} onValueChange={setFilter}>
-				<TabsList>
+				<TabsList data-tour="subscription-tabs">
 					<TabsTrigger value="all">
 						All
 						<Badge className="text-[10px] ml-1 p-0 size-4 rounded-full">
@@ -124,7 +126,10 @@ function SubscriptionsPage() {
 							</Link>
 						</div>
 					) : (
-						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						<div
+							className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+							data-tour="subscription-grid"
+						>
 							{filtered.map((sub) => (
 								<SubscriptionCard key={sub.id} sub={sub} />
 							))}

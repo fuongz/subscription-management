@@ -66,6 +66,55 @@ const dashboardSteps: {
 			},
 		},
 	],
+	subscriptions: [
+		{
+			popover: {
+				title: "Manage Your Subscriptions",
+				description:
+					"This is where you can view, organize, and manage all your subscriptions. Let's explore the features!",
+			},
+		},
+		{
+			element: '[data-tour="subscriptions-header"]',
+			popover: {
+				title: "Overview",
+				description:
+					"See your total monthly spending and active subscription count at a glance.",
+				side: "bottom",
+				align: "start",
+			},
+		},
+		{
+			element: '[data-tour="add-subscription-btn"]',
+			popover: {
+				title: "Add Subscriptions",
+				description:
+					"Click here to add new subscriptions. Choose from templates or create custom ones.",
+				side: "left",
+				align: "center",
+			},
+		},
+		{
+			element: '[data-tour="subscription-tabs"]',
+			popover: {
+				title: "Filter by Status",
+				description:
+					"Filter your subscriptions by status: All, Active, Paused, or Cancelled. Badges show counts for each status.",
+				side: "bottom",
+				align: "start",
+			},
+		},
+		{
+			element: '[data-tour="subscription-grid"]',
+			popover: {
+				title: "Your Subscriptions",
+				description:
+					"View all your subscriptions as cards. Click any card to edit details, change status, or delete.",
+				side: "top",
+				align: "center",
+			},
+		},
+	],
 };
 
 export function useAppTour({ page }: { page?: string }) {
