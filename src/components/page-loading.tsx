@@ -1,10 +1,17 @@
 import { useRouterState } from "@tanstack/react-router";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { Spinner } from "./ui/spinner";
 
 export function PageLoading() {
+	const [mounted, setMounted] = useState(false);
 	const isLoading = useRouterState({ select: (s) => s.status === "pending" });
-	if (!isLoading) return null;
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted || !isLoading) return null;
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}

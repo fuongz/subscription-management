@@ -36,14 +36,11 @@ function LandingPage() {
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ ...gentle, delay: 0.1 }}
-				className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5"
+				className="sticky top-0 z-10 mx-auto flex max-w-6xl items-center bg-[#F6FAF6] px-6 py-5"
 			>
 				<nav className="hidden items-center gap-8 sm:flex">
-					<a
-						href="/"
-						className="text-sm text-[#5A7A6A] transition-colors hover:text-[#1A3A2A]"
-					>
-						Home
+					<a href="/">
+						<img src="/logo.webp" alt="Phake Subscription" className="size-8" />
 					</a>
 					<a
 						href="#features"
@@ -58,7 +55,7 @@ function LandingPage() {
 						How it works
 					</a>
 				</nav>
-				<div>
+				<div className="ml-auto">
 					{session?.user ? (
 						<Link
 							to="/dashboard"

@@ -5,7 +5,6 @@ import {
 	LayoutDashboard,
 	LogOut,
 	Settings,
-	Wallet,
 } from "lucide-react";
 import {
 	DropdownMenu,
@@ -42,7 +41,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { data: session } = authClient.useSession();
 	const navigate = useNavigate();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const { isMobile } = useSidebar();
+	const { isMobile, setOpenMobile } = useSidebar();
 
 	const handleSignOut = async () => {
 		await authClient.signOut();
@@ -54,17 +53,32 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<SidebarMenuButton size="lg" render={<Link to="/dashboard" />}>
-							<div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-								<Wallet className="size-4" />
-							</div>
-							<div className="grid flex-1 text-left text-sm leading-tight">
-								<span className="truncate font-medium">Phake Subscription</span>
-								<span className="truncate text-xs text-muted-foreground">
-									Subscription Management
-								</span>
-							</div>
-						</SidebarMenuButton>
+						<Link
+							to="/dashboard"
+							onClick={() => {
+								if (isMobile) {
+									setOpenMobile(false);
+								}
+							}}
+						>
+							<SidebarMenuButton size="lg">
+								<div>
+									<img
+										src="/logo.webp"
+										alt="Phake Subscription"
+										className="size-8"
+									/>
+								</div>
+								<div className="grid flex-1 text-left text-sm leading-tight">
+									<span className="truncate font-medium">
+										Phake Subscription
+									</span>
+									<span className="truncate text-xs text-muted-foreground">
+										Subscription Management
+									</span>
+								</div>
+							</SidebarMenuButton>
+						</Link>
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarHeader>
@@ -76,7 +90,14 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						<SidebarMenu>
 							{navItems.map((item) => (
 								<SidebarMenuItem key={item.title}>
-									<Link to={item.url}>
+									<Link
+										to={item.url}
+										onClick={() => {
+											if (isMobile) {
+												setOpenMobile(false);
+											}
+										}}
+									>
 										<SidebarMenuButton
 											isActive={
 												pathname === item.url ||

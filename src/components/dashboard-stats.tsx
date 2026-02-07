@@ -280,7 +280,7 @@ export function DashboardStats({
 						{categoryData.length === 0 ? (
 							<p className="text-sm text-muted-foreground">No categories yet</p>
 						) : (
-							<div className="flex items-center gap-6">
+							<div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
 								{/* Donut Chart */}
 								<div className="flex-shrink-0">
 									<ChartContainer
@@ -292,11 +292,8 @@ export function DashboardStats({
 												cursor={false}
 												content={
 													<ChartTooltipContent
-														hideLabel
 														className="min-w-[200px]"
-														formatter={(value) =>
-															formatCurrency(value as number, currency)
-														}
+														hideLabel
 													/>
 												}
 											/>
@@ -321,7 +318,7 @@ export function DashboardStats({
 																	<tspan
 																		x={viewBox.cx}
 																		y={viewBox.cy}
-																		className="fill-foreground text-3xl font-bold"
+																		className="fill-foreground text-2xl font-bold"
 																	>
 																		{active.length}
 																	</tspan>
@@ -343,7 +340,7 @@ export function DashboardStats({
 								</div>
 
 								{/* Category List */}
-								<div className="flex-1 space-y-3">
+								<div className="w-full flex-1 space-y-3">
 									{categoryData.slice(0, 5).map((category) => (
 										<div
 											key={category.name}
