@@ -1,7 +1,7 @@
 {
-	"name": "subscription-management",
+	"name": "prod-sub-webapp",
 	"compatibility_date": "2025-04-01",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": ["nodejs_compat", "no_handle_cross_request_promise_resolution"],
 	"main": "server.ts",
 	"d1_databases": [
 		{
