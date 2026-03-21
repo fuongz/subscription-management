@@ -2,7 +2,7 @@
 	"name": "subscription-management",
 	"compatibility_date": "2025-04-01",
 	"compatibility_flags": ["nodejs_compat"],
-	"main": "@tanstack/react-start/server-entry",
+	"main": "server.ts",
 	"d1_databases": [
 		{
 			"binding": "DB",
@@ -13,6 +13,9 @@
 	],
 	"preview_urls": false,
 	"workers_dev": false,
+	"triggers": {
+		"crons": ["0 9 * * *"]
+	},
 	"routes": [
 		{
 			"pattern": "sub.phake.app",

@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
-import { DollarSign, Globe, User } from "lucide-react";
-import { useState } from "react";
+import { Bell, DollarSign, Globe, User } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -10,6 +10,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import {
 	InputGroup,
@@ -24,7 +25,22 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { authClient } from "@/lib/auth-client";
+import {
+	checkNotificationPermission,
+	requestNotificationPermission,
+	serializePushSubscription,
+	subscribeToPushNotifications,
+	unsubscribeFromPushNotifications,
+} from "@/lib/push-notifications";
+import { triggerRenewalCheck } from "@/server/cron-trigger";
+import {
+	sendTestNotification,
+	subscribePush,
+	unsubscribePush,
+	updateNotificationPreferences,
+} from "@/server/push-subscriptions";
 import {
 	getUserPreferences,
 	updateUserPreferences,
@@ -61,8 +77,11 @@ function getFieldError(field: {
 	if (!field.state.meta.isTouched || field.state.meta.errors.length === 0)
 		return undefined;
 	return field.state.meta.errors
-		.filter((e): e is string | { message: string } =>
-			e !== undefined && (typeof e === "string" || (typeof e === "object" && e !== null && "message" in e))
+		.filter(
+			(e): e is string | { message: string } =>
+				e !== undefined &&
+				(typeof e === "string" ||
+					(typeof e === "object" && e !== null && "message" in e)),
 		)
 		.map((e) => (typeof e === "string" ? e : e.message))
 		.join(", ");
@@ -82,6 +101,31 @@ function SettingsPage() {
 	const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
 		"idle",
 	);
+	const [notificationsEnabled, setNotificationsEnabled] = useState(
+		preferences.enablePushNotifications || false,
+	);
+	const [selectedDays, setSelectedDays] = useState<number[]>(() => {
+		try {
+			return JSON.parse(preferences.notifyDaysBefore || "[1,3,7]");
+		} catch {
+			return [1, 3, 7];
+		}
+	});
+	const [permissionStatus, setPermissionStatus] =
+		useState<NotificationPermission>("default");
+	const [testNotificationStatus, setTestNotificationStatus] = useState<
+		"idle" | "sending" | "sent" | "error"
+	>("idle");
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			checkNotificationPermission()
+				.then(setPermissionStatus)
+				.catch(() => {
+					setPermissionStatus("denied");
+				});
+		}
+	}, []);
 
 	const form = useForm({
 		defaultValues: {
@@ -110,6 +154,91 @@ function SettingsPage() {
 			}
 		},
 	});
+
+	const handleToggleNotifications = async (enabled: boolean) => {
+		if (enabled) {
+			const granted = await requestNotificationPermission();
+			if (!granted) {
+				setStatus("error");
+				return;
+			}
+			setPermissionStatus("granted");
+
+			const subscription = await subscribeToPushNotifications();
+			if (!subscription) {
+				setStatus("error");
+				return;
+			}
+
+			const serialized = serializePushSubscription(subscription);
+			await subscribePush({
+				data: { ...serialized, userAgent: navigator.userAgent },
+			});
+		} else {
+			const registration = await navigator.serviceWorker.ready;
+			const subscription = await registration.pushManager.getSubscription();
+			if (subscription) {
+				await unsubscribePush({ data: subscription.endpoint });
+			}
+			await unsubscribeFromPushNotifications();
+		}
+
+		setNotificationsEnabled(enabled);
+		await updateNotificationPreferences({
+			data: {
+				enablePushNotifications: enabled,
+				notifyDaysBefore: selectedDays,
+			},
+		});
+	};
+
+	const handleDayToggle = async (day: number) => {
+		const newDays = selectedDays.includes(day)
+			? selectedDays.filter((d) => d !== day)
+			: [...selectedDays, day].sort((a, b) => a - b);
+		setSelectedDays(newDays);
+
+		if (notificationsEnabled) {
+			await updateNotificationPreferences({
+				data: {
+					enablePushNotifications: notificationsEnabled,
+					notifyDaysBefore: newDays,
+				},
+			});
+		}
+	};
+
+	const handleTestNotification = async () => {
+		setTestNotificationStatus("sending");
+		try {
+			const result = await sendTestNotification();
+			console.log("Test notification result:", result);
+			setTestNotificationStatus("sent");
+			setTimeout(() => setTestNotificationStatus("idle"), 3000);
+		} catch (error) {
+			console.error("Failed to send test notification:", error);
+			setTestNotificationStatus("error");
+			setTimeout(() => setTestNotificationStatus("idle"), 3000);
+		}
+	};
+
+	const [cronTriggerStatus, setCronTriggerStatus] = useState<
+		"idle" | "sending" | "sent" | "error"
+	>("idle");
+
+	const handleTriggerRenewalCheck = async () => {
+		setCronTriggerStatus("sending");
+		try {
+			const result = await triggerRenewalCheck();
+			console.log("Renewal check result:", result);
+			setCronTriggerStatus("sent");
+			setTimeout(() => setCronTriggerStatus("idle"), 3000);
+		} catch (error) {
+			console.error("Failed to trigger renewal check:", error);
+			setCronTriggerStatus("error");
+			setTimeout(() => setCronTriggerStatus("idle"), 3000);
+		}
+	};
 
 	return (
 		<div className="mx-auto">
@@ -227,6 +356,100 @@ function SettingsPage() {
 								</Field>
 							)}
 						</form.Field>
+
+						{/* Push Notifications */}
+						<div className="space-y-4 rounded-md border p-4">
+							<div className="flex items-center justify-between">
+								<div className="space-y-0.5">
+									<div className="flex items-center gap-2">
+										<Bell className="h-4 w-4 text-muted-foreground" />
+										<span className="text-sm font-medium">
+											Push Notifications
+										</span>
+									</div>
+									<p className="text-xs text-muted-foreground">
+										Get reminded before subscription renewals
+									</p>
+								</div>
+								<Switch
+									checked={notificationsEnabled}
+									onCheckedChange={handleToggleNotifications}
+									disabled={permissionStatus === "denied"}
+								/>
+							</div>
+
+							{permissionStatus === "denied" && (
+								<div className="rounded-md bg-destructive/10 p-3 text-xs text-destructive">
+									Notifications are blocked. Enable them in your browser
+									settings.
+								</div>
+							)}
+
+							{notificationsEnabled && (
+								<div className="space-y-2 pt-2">
+									<div className="text-xs font-medium text-muted-foreground">
+										Remind me:
+									</div>
+									<div className="flex flex-wrap gap-3">
+										{[1, 3, 7, 14, 30].map((day) => (
+											<div key={day} className="flex items-center gap-2">
+												<Checkbox
+													checked={selectedDays.includes(day)}
+													onCheckedChange={() => handleDayToggle(day)}
+												/>
+												<span className="text-sm">
+													{day === 1 ? "1 day" : `${day} days`} before
+												</span>
+											</div>
+										))}
+									</div>
+									<div className="pt-2 flex flex-col gap-2">
+										<div className="flex items-center gap-2">
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={handleTestNotification}
+												disabled={testNotificationStatus === "sending"}
+											>
+												{testNotificationStatus === "sending"
+													? "Sending..."
+													: "Send Test Notification"}
+											</Button>
+											{testNotificationStatus === "sent" && (
+												<span className="text-xs text-green-600 dark:text-green-400">
+													Sent!
+												</span>
+											)}
+											{testNotificationStatus === "error" && (
+												<span className="text-xs text-destructive">Failed</span>
+											)}
+										</div>
+										<div className="flex items-center gap-2">
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={handleTriggerRenewalCheck}
+												disabled={cronTriggerStatus === "sending"}
+											>
+												{cronTriggerStatus === "sending"
+													? "Checking..."
+													: "Check Renewals Now"}
+											</Button>
+											{cronTriggerStatus === "sent" && (
+												<span className="text-xs text-green-600 dark:text-green-400">
+													Done! Check console for details
+												</span>
+											)}
+											{cronTriggerStatus === "error" && (
+												<span className="text-xs text-destructive">Failed</span>
+											)}
+										</div>
+									</div>
+								</div>
+							)}
+						</div>
 
 						{/* Submit */}
 						<form.Subscribe

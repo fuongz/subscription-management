@@ -1,77 +1,87 @@
-import { createServerFn } from '@tanstack/react-start'
-import { getDb } from './db'
-import { userPreference } from '@/db/schema'
-import { eq } from 'drizzle-orm'
-import { getAuth } from '@/lib/auth'
-import { getRequest } from '@tanstack/react-start/server'
-import { env } from 'cloudflare:workers'
-import { z } from 'zod'
+import { env } from "cloudflare:workers";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { eq } from "drizzle-orm";
+import { z } from "zod";
+import { userPreference } from "@/db/schema";
+import { getAuth } from "@/lib/auth";
+import { getDb } from "./db";
 
 function getD1(): D1Database {
-  return (env as { DB: D1Database }).DB
+	return (env as { DB: D1Database }).DB;
 }
 
 async function getAuthenticatedUser(request: Request) {
-  const d1 = getD1()
-  const auth = getAuth(d1)
-  const session = await auth.api.getSession({ headers: request.headers })
-  if (!session?.user) {
-    throw new Error('Unauthorized')
-  }
-  return session.user
+	const d1 = getD1();
+	const auth = getAuth(d1);
+	const session = await auth.api.getSession({ headers: request.headers });
+	if (!session?.user) {
+		throw new Error("Unauthorized");
+	}
+	return session.user;
 }
 
 // ─── Zod schemas ────────────────────────────────────────────────
 
 const updatePreferencesSchema = z.object({
-  currency: z.enum(['USD', 'VND']),
-  timezone: z.string().min(1).max(100),
-})
+	currency: z.enum(["USD", "VND"]),
+	timezone: z.string().min(1).max(100),
+});
 
-export type UpdatePreferencesInput = z.infer<typeof updatePreferencesSchema>
+export type UpdatePreferencesInput = z.infer<typeof updatePreferencesSchema>;
 
 // ─── Server functions ───────────────────────────────────────────
 
-export const getUserPreferences = createServerFn({ method: 'GET' }).handler(async () => {
-  const request = getRequest()
-  if (!request) throw new Error('No request context')
+export const getUserPreferences = createServerFn({ method: "GET" }).handler(
+	async () => {
+		const request = getRequest();
+		if (!request) throw new Error("No request context");
 
-  const user = await getAuthenticatedUser(request)
-  const db = getDb(getD1())
+		const user = await getAuthenticatedUser(request);
+		const db = getDb(getD1());
 
-  const result = await db
-    .select()
-    .from(userPreference)
-    .where(eq(userPreference.userId, user.id))
+		const result = await db
+			.select()
+			.from(userPreference)
+			.where(eq(userPreference.userId, user.id));
 
-  return result[0] || { userId: user.id, currency: 'VND', timezone: 'Asia/Ho_Chi_Minh' }
-})
+		return (
+			result[0] || {
+				userId: user.id,
+				currency: "VND",
+				timezone: "Asia/Ho_Chi_Minh",
+				enablePushNotifications: false,
+				notifyDaysBefore: "[1,3,7]",
+			}
+		);
+	},
+);
 
-export const updateUserPreferences = createServerFn({ method: 'POST' })
-  .inputValidator((input: UpdatePreferencesInput) => {
-    return updatePreferencesSchema.parse(input)
-  })
-  .handler(async ({ data }) => {
-    const request = getRequest()
-    if (!request) throw new Error('No request context')
+export const updateUserPreferences = createServerFn({ method: "POST" })
+	.inputValidator((input: UpdatePreferencesInput) => {
+		return updatePreferencesSchema.parse(input);
+	})
+	.handler(async ({ data }) => {
+		const request = getRequest();
+		if (!request) throw new Error("No request context");
 
-    const user = await getAuthenticatedUser(request)
-    const db = getDb(getD1())
+		const user = await getAuthenticatedUser(request);
+		const db = getDb(getD1());
 
-    await db
-      .insert(userPreference)
-      .values({
-        userId: user.id,
-        currency: data.currency,
-        timezone: data.timezone,
-      })
-      .onConflictDoUpdate({
-        target: userPreference.userId,
-        set: {
-          currency: data.currency,
-          timezone: data.timezone,
-        },
-      })
+		await db
+			.insert(userPreference)
+			.values({
+				userId: user.id,
+				currency: data.currency,
+				timezone: data.timezone,
+			})
+			.onConflictDoUpdate({
+				target: userPreference.userId,
+				set: {
+					currency: data.currency,
+					timezone: data.timezone,
+				},
+			});
 
-    return { success: true }
-  })
+		return { success: true };
+	});

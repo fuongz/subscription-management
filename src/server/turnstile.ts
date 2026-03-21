@@ -15,6 +15,10 @@ export async function verifyTurnstile(
 
 	const secretKey = process.env.TURNSTILE_SECRET_KEY;
 	if (!secretKey || secretKey === "YOUR_TURNSTILE_SECRET_KEY_HERE") {
+		console.warn(
+			"⚠️ SECURITY WARNING: Turnstile verification bypassed - TURNSTILE_SECRET_KEY not configured. " +
+			"This should ONLY happen in development. Configure TURNSTILE_SECRET_KEY for production!"
+		);
 		return true; // Skip verification in development if not configured
 	}
 

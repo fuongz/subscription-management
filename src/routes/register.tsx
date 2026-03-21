@@ -77,7 +77,8 @@ function RegisterPage() {
 				<CardHeader>
 					<CardTitle>Get Started</CardTitle>
 					<CardDescription>
-						Enter your email to receive a magic link to sign in or create an account.
+						Enter your email to receive a magic link to sign in or create an
+						account.
 					</CardDescription>
 				</CardHeader>
 				<form

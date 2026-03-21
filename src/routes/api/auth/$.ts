@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { createFileRoute } from "@tanstack/react-router";
 import { getAuth } from "@/lib/auth";
+import { RATE_LIMITS, checkRateLimit, getClientIp } from "@/lib/rate-limiter";
 import { verifyTurnstile } from "@/server/turnstile";
 
 async function verifyTurnstileMiddleware(
@@ -46,6 +47,44 @@ async function verifyTurnstileMiddleware(
 	return null;
 }
 
+async function rateLimitMiddleware(request: Request): Promise<Response | null> {
+	const url = new URL(request.url);
+	const pathname = url.pathname;
+
+	// Apply rate limiting to auth endpoints
+	if (
+		pathname.includes("/sign-in") ||
+		pathname.includes("/sign-up") ||
+		pathname.includes("/magic-link")
+	) {
+		const clientIp = getClientIp(request);
+		const result = checkRateLimit(`auth:${clientIp}`, RATE_LIMITS.AUTH);
+
+		if (!result.allowed) {
+			const retryAfter = Math.ceil((result.resetAt - Date.now()) / 1000);
+			return new Response(
+				JSON.stringify({
+					error: {
+						message: "Too many requests. Please try again later.",
+					},
+				}),
+				{
+					status: 429,
+					headers: {
+						"Content-Type": "application/json",
+						"Retry-After": retryAfter.toString(),
+						"X-RateLimit-Limit": RATE_LIMITS.AUTH.limit.toString(),
+						"X-RateLimit-Remaining": "0",
+						"X-RateLimit-Reset": Math.floor(result.resetAt / 1000).toString(),
+					},
+				},
+			);
+		}
+	}
+
+	return null;
+}
+
 export const Route = createFileRoute("/api/auth/$")({
 	server: {
 		handlers: {
@@ -54,6 +93,10 @@ export const Route = createFileRoute("/api/auth/$")({
 				return auth.handler(request);
 			},
 			POST: async ({ request }: { request: Request }) => {
+				// Apply rate limiting
+				const rateLimitError = await rateLimitMiddleware(request);
+				if (rateLimitError) return rateLimitError;
+
 				// Verify Turnstile for sign-in/sign-up
 				const turnstileError = await verifyTurnstileMiddleware(request);
 				if (turnstileError) return turnstileError;

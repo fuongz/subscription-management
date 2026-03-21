@@ -5,6 +5,7 @@ import {
 	Scripts,
 	useRouterState,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { PageLoading } from "@/components/page-loading";
 import {
@@ -12,6 +13,7 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { registerServiceWorker } from "@/lib/service-worker";
 import appCss from "../styles.css?url";
 
 const PUBLIC_PATHS = ["/", "/login", "/register"];
@@ -66,6 +68,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 function RootComponent() {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const isPublic = PUBLIC_PATHS.includes(pathname);
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			registerServiceWorker();
+		}
+	}, []);
 
 	if (isPublic) {
 		return <Outlet />;
