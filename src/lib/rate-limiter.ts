@@ -22,15 +22,14 @@ interface RateLimitEntry {
 // In-memory store (resets on worker restart - acceptable for basic protection)
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
-// Clean up old entries every 60 seconds
-setInterval(() => {
-	const now = Date.now();
+// Lazily clean up expired entries on each check
+function cleanExpiredEntries(now: number) {
 	for (const [key, entry] of rateLimitStore.entries()) {
 		if (entry.resetAt < now) {
 			rateLimitStore.delete(key);
 		}
 	}
-}, 60000);
+}
 
 export interface RateLimitResult {
 	allowed: boolean;
@@ -50,6 +49,7 @@ export function checkRateLimit(
 	config: RateLimitConfig,
 ): RateLimitResult {
 	const now = Date.now();
+	cleanExpiredEntries(now);
 	const entry = rateLimitStore.get(identifier);
 
 	// No entry or window expired - create new entry
