@@ -24,21 +24,6 @@ export const Route = createRootRoute({
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
 			{ title: "Phake Subscription - Subscription Management" },
-			{
-				httpEquiv: "Content-Security-Policy",
-				content: [
-					"default-src 'self'",
-					"script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
-					"style-src 'self' 'unsafe-inline'",
-					"img-src 'self' data: https:",
-					"font-src 'self'",
-					"connect-src 'self' https://accounts.google.com https://challenges.cloudflare.com",
-					"frame-src https://accounts.google.com https://challenges.cloudflare.com",
-					"object-src 'none'",
-					"base-uri 'self'",
-					"form-action 'self' https://accounts.google.com",
-				].join("; "),
-			},
 			{ httpEquiv: "X-Content-Type-Options", content: "nosniff" },
 			{
 				httpEquiv: "Referrer-Policy",
